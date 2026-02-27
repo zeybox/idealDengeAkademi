@@ -13,16 +13,16 @@
       <span>@Model.Title</span>
     </nav>
     <article>
-      <h1 style="font-size: 2rem; margin-bottom: 16px;">@Model.Title</h1>
+      <h1 class="prose-title">@Model.Title</h1>
       <div class="card-meta" style="margin-bottom: 24px;">
         @if (Model.PublishedAt.HasValue) { <span>@Model.PublishedAt.Value.ToString("d MMMM yyyy")</span> }
         @if (Model.Author != null) { <span>@Model.Author.FullName</span> }
       </div>
       @if (!string.IsNullOrEmpty(Model.ImageUrl))
       {
-        <img src="@Model.ImageUrl" alt="@Model.Title" style="width:100%;border-radius:var(--radius);margin-bottom:24px;" />
+        <img src="@Model.ImageUrl" alt="@Model.Title" class="prose-img" />
       }
-      <div style="line-height: 1.8;">
+      <div class="prose">
         @Html.Raw(Model.Content ?? Model.Excerpt ?? "")
       </div>
     </article>
