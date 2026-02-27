@@ -25,6 +25,14 @@ public class LoadSiteTextsFilter : IAsyncResultFilter
                 ?? "İdeal Denge Akademi";
             var siteUrl = await _settings.GetAsync("SiteUrl", context.HttpContext.RequestAborted);
             controller.ViewData["SiteUrl"] = !string.IsNullOrWhiteSpace(siteUrl) ? siteUrl.Trim() : null;
+            var favicon = await _settings.GetAsync("FaviconUrl", context.HttpContext.RequestAborted);
+            controller.ViewData["FaviconUrl"] = !string.IsNullOrWhiteSpace(favicon) ? favicon.Trim() : "~/images/Logo.png";
+            var siteLogo = await _settings.GetAsync("SiteLogoUrl", context.HttpContext.RequestAborted);
+            controller.ViewData["SiteLogoUrl"] = !string.IsNullOrWhiteSpace(siteLogo) ? siteLogo.Trim() : "~/images/Logo.png";
+            var footerLogo = await _settings.GetAsync("FooterLogoUrl", context.HttpContext.RequestAborted);
+            controller.ViewData["FooterLogoUrl"] = !string.IsNullOrWhiteSpace(footerLogo) ? footerLogo.Trim() : null;
+            var adminLogo = await _settings.GetAsync("AdminLogoUrl", context.HttpContext.RequestAborted);
+            controller.ViewData["AdminLogoUrl"] = !string.IsNullOrWhiteSpace(adminLogo) ? adminLogo.Trim() : null;
         }
         await next();
     }

@@ -12,16 +12,20 @@ public class SettingsController : Controller
 {
     private readonly ApplicationDbContext _db;
     private readonly SettingsService _settings;
+    private readonly IWebHostEnvironment _env;
 
-    public SettingsController(ApplicationDbContext db, SettingsService settings)
+    private static readonly string[] AllowedImageExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".webp", ".ico" };
+
+    public SettingsController(ApplicationDbContext db, SettingsService settings, IWebHostEnvironment env)
     {
         _db = db;
         _settings = settings;
+        _env = env;
     }
 
     public async Task<IActionResult> Index(CancellationToken ct = default)
     {
-        var keys = new[] { "SiteName", "SiteDescription", "DefaultCoursePrice", "ContactEmail", "PayTR_MerchantId", "PayTR_MerchantKey", "PayTR_MerchantSalt", "Google_ClientId", "Google_ClientSecret", "AboutPageContent", "MetaDescriptionDefault", "SiteUrl" };
+        var keys = new[] { "SiteName", "SiteDescription", "DefaultCoursePrice", "ContactEmail", "PayTR_MerchantId", "PayTR_MerchantKey", "PayTR_MerchantSalt", "Google_ClientId", "Google_ClientSecret", "AboutPageContent", "MetaDescriptionDefault", "SiteUrl", "FaviconUrl", "SiteLogoUrl", "FooterLogoUrl", "AdminLogoUrl" };
         var dict = new Dictionary<string, string?>();
         foreach (var k in keys) dict[k] = await _settings.GetAsync(k, ct);
         ViewBag.Settings = dict;
@@ -59,6 +63,62 @@ public class SettingsController : Controller
         await _settings.SetAsync("SiteUrl", SiteUrl, ct);
         TempData["Toast"] = "SEO ayarları kaydedildi.";
         return RedirectToAction(nameof(Index), new { tab = "panel-seo" });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [RequestSizeLimit(10 * 1024 * 1024)]
+    public async Task<IActionResult> Logos(
+        string? FaviconUrl,
+        string? SiteLogoUrl,
+        string? FooterLogoUrl,
+        string? AdminLogoUrl,
+        IFormFile? FaviconFile,
+        IFormFile? SiteLogoFile,
+        IFormFile? FooterLogoFile,
+        IFormFile? AdminLogoFile,
+        CancellationToken ct = default)
+    {
+        if (FaviconFile != null)
+        {
+            var url = await SaveLogoFileAsync(FaviconFile, ct);
+            if (url != null) FaviconUrl = url;
+        }
+        if (SiteLogoFile != null)
+        {
+            var url = await SaveLogoFileAsync(SiteLogoFile, ct);
+            if (url != null) SiteLogoUrl = url;
+        }
+        if (FooterLogoFile != null)
+        {
+            var url = await SaveLogoFileAsync(FooterLogoFile, ct);
+            if (url != null) FooterLogoUrl = url;
+        }
+        if (AdminLogoFile != null)
+        {
+            var url = await SaveLogoFileAsync(AdminLogoFile, ct);
+            if (url != null) AdminLogoUrl = url;
+        }
+        await _settings.SetAsync("FaviconUrl", FaviconUrl, ct);
+        await _settings.SetAsync("SiteLogoUrl", SiteLogoUrl, ct);
+        await _settings.SetAsync("FooterLogoUrl", FooterLogoUrl, ct);
+        await _settings.SetAsync("AdminLogoUrl", AdminLogoUrl, ct);
+        TempData["Toast"] = "Logolar kaydedildi.";
+        return RedirectToAction(nameof(Index), new { tab = "panel-logolar" });
+    }
+
+    private async Task<string?> SaveLogoFileAsync(IFormFile file, CancellationToken ct)
+    {
+        if (file.Length == 0) return null;
+        var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+        if (string.IsNullOrEmpty(ext) || !AllowedImageExtensions.Contains(ext)) return null;
+        var uploadsDir = Path.Combine(_env.WebRootPath, "uploads");
+        Directory.CreateDirectory(uploadsDir);
+        var fileName = $"{Guid.NewGuid():N}{ext}";
+        var filePath = Path.Combine(uploadsDir, fileName);
+        await using (var stream = System.IO.File.Create(filePath))
+            await file.CopyToAsync(stream, ct);
+        return $"~/uploads/{fileName}";
     }
 
     [HttpPost]

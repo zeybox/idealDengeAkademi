@@ -7,6 +7,7 @@
 <div class="tabs" style="margin-bottom: 24px;">
   <a href="#panel-genel" class="tab active">Genel</a>
   <a href="#panel-seo" class="tab">SEO</a>
+  <a href="#panel-logolar" class="tab">Logolar</a>
   <a href="#panel-paytr" class="tab">PayTR</a>
   <a href="#panel-google" class="tab">Google Giriş</a>
   <a href="#panel-hakkimizda" class="tab">Hakkımızda</a>
@@ -54,6 +55,69 @@
       <label>Site adresi (domain)</label>
       <input type="text" name="SiteUrl" class="form-control" value="@Get("SiteUrl")" placeholder="Örn: www.idealdengeakademi.com" />
       <small style="color: var(--text-muted); font-size: 0.85rem;">Sayfa başlığının sonunda görünür. Boş bırakılırsa varsayılan metin kullanılır.</small>
+    </div>
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+  </form>
+</div>
+
+<div class="card settings-panel" id="panel-logolar" style="padding: 24px; max-width: 640px; margin-top: 24px;">
+  <h2 style="font-size: 1.2rem; margin-bottom: 20px;">Logolar</h2>
+  <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">Favicon, üst menü, footer ve admin menü logolarını yükleyin. Yeni dosya seçmezseniz mevcut logo korunur. Önerilen: PNG veya ICO (favicon için).</p>
+  <form asp-action="Logos" method="post" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+    @{
+      var faviconUrl = Get("FaviconUrl");
+      var siteLogoUrl = Get("SiteLogoUrl");
+      var footerLogoUrl = Get("FooterLogoUrl");
+      var adminLogoUrl = Get("AdminLogoUrl");
+      if (string.IsNullOrWhiteSpace(faviconUrl)) { faviconUrl = "~/images/Logo.png"; }
+      if (string.IsNullOrWhiteSpace(siteLogoUrl)) { siteLogoUrl = "~/images/Logo.png"; }
+    }
+    <input type="hidden" name="FaviconUrl" value="@Get("FaviconUrl")" />
+    <input type="hidden" name="SiteLogoUrl" value="@Get("SiteLogoUrl")" />
+    <input type="hidden" name="FooterLogoUrl" value="@Get("FooterLogoUrl")" />
+    <input type="hidden" name="AdminLogoUrl" value="@Get("AdminLogoUrl")" />
+    <div class="form-group" style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start;">
+      <div style="flex: 1; min-width: 140px;">
+        <label>Mevcut</label>
+        <img src="@Url.Content(faviconUrl)" alt="Favicon" style="max-width: 48px; max-height: 48px; display: block; margin-top: 4px; border: 1px solid var(--border); border-radius: 4px;" />
+      </div>
+      <div style="flex: 2; min-width: 200px;">
+        <label>Favicon (sekme ikonu)</label>
+        <input type="file" name="FaviconFile" class="form-control" accept="image/*,.ico" />
+      </div>
+    </div>
+    <div class="form-group" style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start;">
+      <div style="flex: 1; min-width: 140px;">
+        <label>Mevcut</label>
+        <img src="@Url.Content(siteLogoUrl)" alt="Site logosu" style="max-width: 120px; max-height: 60px; display: block; margin-top: 4px; border: 1px solid var(--border); border-radius: 4px;" />
+      </div>
+      <div style="flex: 2; min-width: 200px;">
+        <label>Site / Üst menü logosu</label>
+        <input type="file" name="SiteLogoFile" class="form-control" accept="image/*" />
+      </div>
+    </div>
+    <div class="form-group" style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start;">
+      <div style="flex: 1; min-width: 140px;">
+        <label>Mevcut</label>
+        <img src="@Url.Content(string.IsNullOrWhiteSpace(footerLogoUrl) ? siteLogoUrl : footerLogoUrl)" alt="Footer logosu" style="max-width: 120px; max-height: 60px; display: block; margin-top: 4px; border: 1px solid var(--border); border-radius: 4px;" />
+      </div>
+      <div style="flex: 2; min-width: 200px;">
+        <label>Footer logosu</label>
+        <input type="file" name="FooterLogoFile" class="form-control" accept="image/*" />
+        <small style="color: var(--text-muted); font-size: 0.85rem;">Boş bırakılırsa site logosu kullanılır.</small>
+      </div>
+    </div>
+    <div class="form-group" style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start;">
+      <div style="flex: 1; min-width: 140px;">
+        <label>Mevcut</label>
+        <img src="@Url.Content(string.IsNullOrWhiteSpace(adminLogoUrl) ? siteLogoUrl : adminLogoUrl)" alt="Admin logosu" style="max-width: 120px; max-height: 60px; display: block; margin-top: 4px; border: 1px solid var(--border); border-radius: 4px;" />
+      </div>
+      <div style="flex: 2; min-width: 200px;">
+        <label>Admin sol menü logosu</label>
+        <input type="file" name="AdminLogoFile" class="form-control" accept="image/*" />
+        <small style="color: var(--text-muted); font-size: 0.85rem;">Boş bırakılırsa site logosu kullanılır.</small>
+      </div>
     </div>
     <button type="submit" class="btn btn-primary">Kaydet</button>
   </form>
