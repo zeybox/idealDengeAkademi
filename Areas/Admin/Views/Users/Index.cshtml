@@ -1,0 +1,61 @@
+@model List<HizliOgren.Models.User>
+@{
+  ViewData["Title"] = "Kullanıcı Yönetimi";
+  var purchaseCounts = ViewBag.PurchaseCounts as Dictionary<int, int>;
+  var q = ViewBag.Q as string;
+  var role = ViewBag.Role as string;
+}
+@if (TempData["Message"] != null)
+{
+  <p class="alert alert-success" style="margin-bottom: 16px;">@TempData["Message"]</p>
+}
+<form method="get" asp-action="Index" style="margin-bottom: 24px;">
+  <input type="search" name="q" class="form-control" placeholder="E-posta veya ad ile ara..." value="@q" style="max-width: 320px; display: inline-block;" />
+  <select name="role" class="form-control" style="max-width: 180px; display: inline-block;">
+    <option value="">Rol: Tümü</option>
+    <option value="0" selected="@(role == "0")">Üye</option>
+    <option value="1" selected="@(role == "1")">Eğitmen</option>
+    <option value="2" selected="@(role == "2")">Admin</option>
+  </select>
+  <button type="submit" class="btn btn-ghost">Filtrele</button>
+</form>
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Ad Soyad</th>
+        <th>E-posta</th>
+        <th>Rol</th>
+        <th>Satın Alınan</th>
+        <th>Kayıt Tarihi</th>
+        <th>İşlem</th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach (var u in Model)
+      {
+        var count = purchaseCounts != null && purchaseCounts.TryGetValue(u.Id, out var n) ? n : 0;
+        <tr>
+          <td>@u.FullName</td>
+          <td>@u.Email</td>
+          <td>@u.Role.ToString()</td>
+          <td><span class="badge badge-primary">@count eğitim</span></td>
+          <td>@u.CreatedAt.ToString("d MMM yyyy")</td>
+          <td>
+            <a asp-action="Edit" asp-route-id="@u.Id" class="btn btn-ghost btn-sm">Düzenle</a>
+            <form method="post" asp-action="ChangeRole" asp-route-id="@u.Id" style="display: inline-flex; gap: 6px; align-items: center;">
+              @Html.AntiForgeryToken()
+              <select name="role" class="form-control" style="width: auto; min-width: 100px;">
+                <option value="0" selected="@(u.Role == HizliOgren.Models.UserRole.Uye)">Üye</option>
+                <option value="1" selected="@(u.Role == HizliOgren.Models.UserRole.Egitmen)">Eğitmen</option>
+                <option value="2" selected="@(u.Role == HizliOgren.Models.UserRole.Admin)">Admin</option>
+              </select>
+              <button type="submit" class="btn btn-ghost btn-sm">Rol Güncelle</button>
+            </form>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+@if (Model.Count == 0) { <p style="color: var(--text-muted);">Kullanıcı bulunamadı.</p> }

@@ -1,0 +1,68 @@
+@model HizliOgren.Models.InstructorApplication
+@{
+  ViewData["Title"] = "Eğitmen Başvurusu — " + Model.FullName;
+}
+<div class="card" style="padding: 24px; max-width: 720px;">
+  <h2>Başvuru Detayı</h2>
+  <dl style="display: grid; gap: 12px; margin-bottom: 24px;">
+    <div>
+      <dt style="font-weight: 600; color: var(--text-muted); font-size: 0.85rem;">Ad Soyad</dt>
+      <dd style="margin: 4px 0 0;">@Model.FullName</dd>
+    </div>
+    <div>
+      <dt style="font-weight: 600; color: var(--text-muted); font-size: 0.85rem;">E-posta</dt>
+      <dd style="margin: 4px 0 0;">@Model.Email</dd>
+    </div>
+    <div>
+      <dt style="font-weight: 600; color: var(--text-muted); font-size: 0.85rem;">Telefon</dt>
+      <dd style="margin: 4px 0 0;">@(Model.Phone ?? "—")</dd>
+    </div>
+    <div>
+      <dt style="font-weight: 600; color: var(--text-muted); font-size: 0.85rem;">Şehir</dt>
+      <dd style="margin: 4px 0 0;">@(Model.City ?? "—")</dd>
+    </div>
+    <div>
+      <dt style="font-weight: 600; color: var(--text-muted); font-size: 0.85rem;">Durum</dt>
+      <dd style="margin: 4px 0 0;">
+        <span class="badge @(Model.Status == HizliOgren.Models.InstructorApplicationStatus.Pending ? "badge-primary" : Model.Status == HizliOgren.Models.InstructorApplicationStatus.Approved ? "badge-success" : "badge-warning")">
+          @(Model.Status == HizliOgren.Models.InstructorApplicationStatus.Pending ? "Beklemede" : Model.Status == HizliOgren.Models.InstructorApplicationStatus.Approved ? "Onaylandı" : "Reddedildi")
+        </span>
+      </dd>
+    </div>
+    <div>
+      <dt style="font-weight: 600; color: var(--text-muted); font-size: 0.85rem;">Başvuru Tarihi</dt>
+      <dd style="margin: 4px 0 0;">@Model.CreatedAt.ToString("d MMMM yyyy HH:mm")</dd>
+    </div>
+    @if (Model.UserId.HasValue && Model.User != null)
+    {
+      <div>
+        <dt style="font-weight: 600; color: var(--text-muted); font-size: 0.85rem;">Site Üyesi</dt>
+        <dd style="margin: 4px 0 0;">
+          Evet — <a asp-controller="Users" asp-action="Edit" asp-route-id="@Model.UserId">@Model.User.FullName (#@Model.UserId)</a>
+        </dd>
+      </div>
+    }
+    else
+    {
+      <div>
+        <dt style="font-weight: 600; color: var(--text-muted); font-size: 0.85rem;">Site Üyesi</dt>
+        <dd style="margin: 4px 0 0;">Hayır (misafir başvurusu)</dd>
+      </div>
+    }
+    @if (!string.IsNullOrWhiteSpace(Model.Message))
+    {
+      <div>
+        <dt style="font-weight: 600; color: var(--text-muted); font-size: 0.85rem;">Deneyim / Mesaj</dt>
+        <dd style="margin: 4px 0 0; white-space: pre-wrap;">@Model.Message</dd>
+      </div>
+    }
+    @if (!string.IsNullOrWhiteSpace(Model.AdminNotes))
+    {
+      <div>
+        <dt style="font-weight: 600; color: var(--text-muted); font-size: 0.85rem;">Admin Notu</dt>
+        <dd style="margin: 4px 0 0; white-space: pre-wrap;">@Model.AdminNotes</dd>
+      </div>
+    }
+  </dl>
+  <a asp-action="Index" class="btn btn-ghost">← Listeye Dön</a>
+</div>

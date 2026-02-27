@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>@(ViewData["Title"] != null ? ViewData["Title"] + " | Admin | " : "Admin | ")Hızlı Öğren</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="~/images/Logo.png" />
+  <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
+</head>
+<body>
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <a asp-area="" asp-controller="Home" asp-action="Index" class="logo"><img src="~/images/Logo.png" alt="Hızlı Öğren"></a>
+      <nav class="admin-nav">
+        <a asp-area="Admin" asp-controller="Home" asp-action="Index">📊 Yönetim Paneli</a>
+        <a asp-area="Admin" asp-controller="Users" asp-action="Index">👥 Kullanıcılar</a>
+        <a asp-area="Admin" asp-controller="InstructorApplications" asp-action="Index">📋 Eğitmen Başvuruları</a>
+        <a asp-area="Admin" asp-controller="Courses" asp-action="Index">📚 Eğitimler</a>
+        <a asp-area="Admin" asp-controller="Blog" asp-action="Index">📝 Blog</a>
+        <a asp-area="Admin" asp-controller="Orders" asp-action="Index">📦 Siparişler</a>
+        <a asp-area="Admin" asp-controller="HeroSlides" asp-action="Index">🖼️ Slaytlar</a>
+        <a asp-area="Admin" asp-controller="Settings" asp-action="Index">⚙️ Ayarlar</a>
+        <a asp-area="Admin" asp-controller="SiteTexts" asp-action="Index">📄 Site Sabit Yazılar</a>
+        <a asp-area="" asp-controller="Home" asp-action="Index" style="margin-top: 24px; border-top: 1px solid #334155; padding-top: 24px;">← Siteye Dön</a>
+      </nav>
+    </aside>
+    <main class="admin-main">
+      <div class="admin-header">
+        <h1>@ViewData["Title"]</h1>
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <span style="color: var(--text-muted); font-size: 0.9rem;">Admin</span>
+          <a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-ghost">Siteye Git</a>
+        </div>
+      </div>
+      @if (TempData["Toast"] != null)
+      {
+        <div class="alert alert-success" style="margin-bottom: 24px;">@TempData["Toast"]</div>
+      }
+      @RenderBody()
+    </main>
+  </div>
+  <script src="~/js/main.js" asp-append-version="true"></script>
+  @await RenderSectionAsync("Scripts", required: false)
+  @await Html.PartialAsync("_ConfirmModal")
+</body>
+</html>

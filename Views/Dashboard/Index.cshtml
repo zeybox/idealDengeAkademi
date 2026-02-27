@@ -1,0 +1,75 @@
+@model List<HizliOgren.Models.Course>
+@{
+  ViewData["Title"] = "Hesabım";
+  var name = User.Identity?.Name ?? "Kullanıcı";
+}
+<section class="section">
+  <div class="container">
+    <nav class="breadcrumb">
+      <a asp-controller="Home" asp-action="Index">Ana Sayfa</a>
+      <span>/</span>
+      <span>Hesabım</span>
+    </nav>
+
+    <div class="dashboard-layout">
+      <aside class="sidebar">
+        <ul class="sidebar-nav">
+          <li><a href="#egitimlerim" class="active"><span class="icon">📚</span> Eğitimlerim</a></li>
+          <li><a asp-controller="Profile" asp-action="Index"><span class="icon">👤</span> Profilim</a></li>
+          <li><a asp-controller="Home" asp-action="Index"><span class="icon">🏠</span> Siteye Dön</a></li>
+        </ul>
+      </aside>
+
+      <div class="main-content">
+        <h1 style="font-size: 1.75rem; margin-bottom: 24px;">Hoş geldiniz, @name</h1>
+        <div class="stat-cards">
+          <div class="stat-card">
+            <h4>Satın Alınan Eğitim</h4>
+            <div class="value">@Model.Count</div>
+          </div>
+        </div>
+
+        <h2 style="font-size: 1.25rem; margin-bottom: 16px;" id="egitimlerim">Eğitimlerim</h2>
+        <p style="color: var(--text-muted); margin-bottom: 24px;">Satın aldığınız eğitimler. Video, PDF ve makalelere buradan ulaşabilirsiniz.</p>
+
+        @if (Model.Count > 0)
+        {
+          <div class="course-grid">
+            @foreach (var course in Model)
+            {
+              <article class="card">
+                <img src="@(course.ImageUrl ?? "https://placehold.co/400x250/e0f2f1/0f766e?text=" + Uri.EscapeDataString(course.Title))" alt="@course.Title" class="card-img" />
+                <div class="card-body">
+                  <h3 class="card-title">@course.Title</h3>
+                  <div class="card-meta">
+                    <span>@course.Category?.Name</span>
+                  </div>
+                  @if (course.Instructor != null)
+                  {
+                    <a asp-controller="Instructors" asp-action="Profile" asp-route-id="@course.Instructor.Id" style="display: flex; align-items: center; gap: 8px; margin-top: 10px; color: var(--text-muted); font-size: 0.9rem; text-decoration: none;">
+                      @if (!string.IsNullOrWhiteSpace(course.Instructor.AvatarUrl))
+                      { <img src="@course.Instructor.AvatarUrl" alt="" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover;" /> }
+                      else
+                      { <span style="width: 24px; height: 24px; background: var(--bg-soft); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem;">👤</span> }
+                      <span>@course.Instructor.FullName</span>
+                    </a>
+                  }
+                </div>
+                <div class="card-footer">
+                  <a asp-controller="Courses" asp-action="Watch" asp-route-id="@course.Id" class="btn btn-primary">Eğitimi İzle</a>
+                </div>
+              </article>
+            }
+          </div>
+        }
+        else
+        {
+          <div class="empty-state">
+            <p>Henüz satın aldığınız eğitim yok.</p>
+            <a asp-controller="Courses" asp-action="Index" class="btn btn-primary">Eğitimlere Göz At</a>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,62 @@
+@model HizliOgren.Models.Course
+@{
+  ViewData["Title"] = Model.Title + " - İzle";
+}
+<section class="section">
+  <div class="container">
+    <nav class="breadcrumb">
+      <a asp-controller="Home" asp-action="Index">Ana Sayfa</a>
+      <span>/</span>
+      <a asp-controller="Dashboard" asp-action="Index">Eğitimlerim</a>
+      <span>/</span>
+      <span>@Model.Title</span>
+    </nav>
+    <div style="display: flex; align-items: flex-start; gap: 20px; margin-bottom: 24px; flex-wrap: wrap;">
+      @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+      {
+        <img src="@Model.ImageUrl" alt="@Model.Title" class="course-cover-watch" style="width: 160px; min-width: 160px; height: 90px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--border); box-shadow: var(--shadow);" />
+      }
+      <div style="flex: 1; min-width: 0;">
+        <h1 style="margin: 0 0 4px 0;">@Model.Title</h1>
+        @if (Model.Instructor != null)
+        {
+          <a asp-controller="Instructors" asp-action="Profile" asp-route-id="@Model.Instructor.Id" style="display: inline-flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 0.95rem; color: var(--text-muted); text-decoration: none;">
+            @if (!string.IsNullOrWhiteSpace(Model.Instructor.AvatarUrl))
+            { <img src="@Model.Instructor.AvatarUrl" alt="" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;" /> }
+            else
+            { <span style="width: 28px; height: 28px; background: var(--bg-soft); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem;">👤</span> }
+            <span>Eğitmen: @Model.Instructor.FullName</span>
+          </a>
+        }
+      </div>
+    </div>
+    @if (!string.IsNullOrWhiteSpace(Model.PaidContent))
+    {
+      <div class="course-paid-content section-card" style="max-width: 800px; margin-bottom: 32px;">
+        <div class="course-description">@Html.Raw(Model.PaidContent)</div>
+      </div>
+    }
+    <div class="curriculum-list" style="max-width: 800px;">
+      @foreach (var item in Model.CurriculumItems ?? new List<HizliOgren.Models.CurriculumItem>())
+      {
+        <div class="card" style="padding: 16px; margin-bottom: 16px;">
+          <h3 style="font-size: 1.1rem; margin-bottom: 8px;">@item.Title</h3>
+          @if (item.Type == "video" && !string.IsNullOrEmpty(item.YoutubeUrl))
+          {
+            var vid = item.YoutubeUrl;
+            if (vid.Contains("youtube.com/watch?v=")) vid = "https://www.youtube.com/embed/" + vid.Split("v=")[1].Split('&')[0];
+            else if (vid.Contains("youtu.be/")) vid = "https://www.youtube.com/embed/" + vid.Split("youtu.be/")[1].Split('?')[0];
+            <div class="video-wrapper" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;">
+              <iframe src="@vid" style="position:absolute;top:0;left:0;width:100%;height:100%;" allowfullscreen></iframe>
+            </div>
+          }
+          else
+          {
+            <p style="color: var(--text-muted);">@(item.Extra ?? item.Title)</p>
+          }
+        </div>
+      }
+    </div>
+    <p style="margin-top: 24px;"><a asp-controller="Dashboard" asp-action="Index" class="btn btn-ghost">← Eğitimlerime Dön</a></p>
+  </div>
+</section>

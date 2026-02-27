@@ -1,0 +1,79 @@
+@model List<HizliOgren.Models.Course>
+@{
+  ViewData["Title"] = "Sepet & Ödeme";
+  var total = ViewBag.Total as decimal? ?? Model.Sum(c => c.Price);
+}
+<section class="page-header">
+  <div class="container">
+    <nav class="breadcrumb">
+      <a asp-controller="Home" asp-action="Index">Ana Sayfa</a>
+      <span>/</span>
+      <span>Sepet</span>
+    </nav>
+    <h1>Sepet & Ödeme</h1>
+    <p>Satın almak istediğiniz eğitimleri kontrol edin ve ödemeye geçin.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div style="display: grid; grid-template-columns: 1fr 380px; gap: 32px; align-items: start;">
+      <div>
+        <h2 style="font-size: 1.25rem; margin-bottom: 20px;">Sepetiniz</h2>
+        @if (Model.Count > 0)
+        {
+          @foreach (var course in Model)
+          {
+            <div class="cart-item">
+              <img src="@(course.ImageUrl ?? "https://placehold.co/120x80/e0f2f1/0f766e?text=Egitim")" alt="@course.Title" class="cart-item-img" />
+              <div class="cart-item-details">
+                <h3 style="font-size: 1.1rem; margin-bottom: 4px;">@course.Title</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">@course.Category?.Name</p>
+                <p style="font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-top: 8px;">₺@course.Price.ToString("N0")</p>
+              </div>
+              <div>
+                <form asp-action="RemoveFromCart" method="post" style="display:inline;">
+                  @Html.AntiForgeryToken()
+                  <input type="hidden" name="courseId" value="@course.Id" />
+                  <button type="submit" class="btn btn-ghost" style="padding: 8px 12px;">Kaldır</button>
+                </form>
+              </div>
+            </div>
+          }
+        }
+        else
+        {
+          <div class="empty-state">
+            <div class="icon">🛒</div>
+            <h3>Sepetiniz boş</h3>
+            <p>Eğitimlere göz atıp sepete ekleyebilirsiniz.</p>
+            <a asp-controller="Courses" asp-action="Index" class="btn btn-primary">Eğitimlere Git</a>
+          </div>
+        }
+        <p style="margin-top: 24px;">
+          <a asp-controller="Courses" asp-action="Index" class="btn btn-ghost">← Eğitimlere Dön</a>
+        </p>
+      </div>
+
+      @if (Model.Count > 0)
+      {
+        <aside class="card" style="padding: 24px;">
+          <h3 style="font-size: 1.2rem; margin-bottom: 16px;">Özet</h3>
+          <p style="font-size: 1.25rem; font-weight: 700; margin-bottom: 24px;">Toplam: ₺@total.ToString("N0")</p>
+          @if (User.Identity?.IsAuthenticated == true)
+          {
+            <form asp-action="Pay" method="post">
+              @Html.AntiForgeryToken()
+              <button type="submit" class="btn btn-primary" style="width: 100%;">Ödemeye Geç</button>
+            </form>
+          }
+          else
+          {
+            <p style="color: var(--text-muted); margin-bottom: 16px;">Ödeme için giriş yapmalısınız.</p>
+            <a asp-controller="Auth" asp-action="Login" asp-route-returnUrl="@Url.Action("Index","Checkout")" class="btn btn-primary" style="width: 100%;">Giriş Yap</a>
+          }
+        </aside>
+      }
+    </div>
+  </div>
+</section>

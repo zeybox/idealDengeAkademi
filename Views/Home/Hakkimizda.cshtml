@@ -1,0 +1,68 @@
+@{
+  ViewData["Title"] = "Hakkımızda";
+  var aboutHtml = ViewData["AboutPageContent"] as string;
+  var hasCustomContent = !string.IsNullOrWhiteSpace(aboutHtml);
+}
+<section class="page-header">
+  <div class="container">
+    <nav class="breadcrumb">
+      <a asp-controller="Home" asp-action="Index">Ana Sayfa</a>
+      <span>/</span>
+      <span>Hakkımızda</span>
+    </nav>
+    <h1>Hakkımızda</h1>
+    <p>@(ViewData["HakkimizdaBreadcrumbSubtitle"] ?? "Hızlı Öğren olarak nereden geldiğimiz, neye inandığımız ve sizin için neler sunduğumuz.")</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div style="max-width: 720px; margin: 0 auto;">
+      @if (hasCustomContent)
+      {
+        @Html.Raw(aboutHtml)
+        <div class="card" style="padding: 32px; text-align: center; margin-top: 48px;">
+          <h3 style="margin-bottom: 12px;">@(ViewData["HakkimizdaBoxTitle"] ?? "Hemen Başlayın")</h3>
+          <p style="color: var(--text-muted); margin-bottom: 20px;">@(ViewData["HakkimizdaBoxText"] ?? "Eğitim kataloğumuzu inceleyin, ihtiyacınıza uygun eğitimi seçin ve öğrenmeye bugün başlayın.")</p>
+          <a asp-controller="Courses" asp-action="Index" class="btn btn-primary">Eğitimlere Göz At</a>
+        </div>
+      }
+      else
+      {
+        <h2 style="font-size: 1.5rem; margin-bottom: 16px; color: var(--text);">Biz Kimiz?</h2>
+        <p style="color: var(--text-muted); margin-bottom: 24px; line-height: 1.8;">
+          Hızlı Öğren, kişisel ve mesleki gelişim ihtiyaçlarını karşılamak için kurulmuş bir online eğitim platformudur. Amacımız, herkesin kendi hızında, güvenilir ve uygulanabilir içeriklerle öğrenmesine imkân tanımaktır. Alanında deneyimli eğitmenlerimizle hazırladığımız video dersler, PDF kaynaklar ve makalelerle bilgiye hızlı ve kalıcı şekilde ulaşmanızı hedefliyoruz.
+        </p>
+
+        <h2 style="font-size: 1.5rem; margin-bottom: 16px; color: var(--text); margin-top: 40px;">Misyonumuz</h2>
+        <p style="color: var(--text-muted); margin-bottom: 24px; line-height: 1.8;">
+          Öğrenmeyi kolaylaştırmak ve hayatın her alanında kullanılabilir beceriler kazandırmak. İster iletişim, ister liderlik, ister kişisel gelişim olsun; iş ve özel hayatınızda hemen uygulayabileceğiniz, sade ve anlaşılır eğitimler sunuyoruz. Her eğitimi satın alan kullanıcımız, o içeriğe süresiz erişim hakkına sahip olur — böylece istediğiniz zaman, istediğiniz yerden tekrar edebilirsiniz.
+        </p>
+
+        <h2 style="font-size: 1.5rem; margin-bottom: 16px; color: var(--text); margin-top: 40px;">Değerlerimiz</h2>
+        <ul style="color: var(--text-muted); line-height: 1.9; padding-left: 24px; margin-bottom: 24px;">
+          <li><strong style="color: var(--text);">Kalite:</strong> İçeriklerimiz alanında uzman eğitmenler tarafından hazırlanır ve düzenli güncellenir.</li>
+          <li><strong style="color: var(--text);">Erişilebilirlik:</strong> Sade bir arayüz ve net yapıyla, herkesin kolayca eğitimlere ulaşmasını sağlıyoruz.</li>
+          <li><strong style="color: var(--text);">Şeffaflık:</strong> Hangi eğitimde ne bulacağınızı açıkça gösteriyoruz; satın aldığınız her eğitim hesabınızda kalır.</li>
+          <li><strong style="color: var(--text);">Pratik odak:</strong> Teorik bilginin yanı sıra günlük hayatta uygulayabileceğiniz örnekler ve ipuçları sunuyoruz.</li>
+        </ul>
+
+        <h2 style="font-size: 1.5rem; margin-bottom: 16px; color: var(--text); margin-top: 40px;">Nasıl Çalışıyoruz?</h2>
+        <p style="color: var(--text-muted); margin-bottom: 16px; line-height: 1.8;">
+          Platformumuzda eğitimler kategorilere ayrılmıştır: İletişim, Yönetim ve Liderlik, Kişisel Gelişim, Satış Okulu, Sunum Becerileri, Zaman Yönetimi ve daha fazlası. İstediğiniz eğitimi inceleyebilir, satın alabilir ve satın aldığınız anda ilgili tüm video, PDF ve makalelere süresiz erişebilirsiniz. Blog bölümümüz herkese açıktır; üyelik gerekmeden makaleleri okuyabilirsiniz.
+        </p>
+
+        <h2 style="font-size: 1.5rem; margin-bottom: 16px; color: var(--text); margin-top: 40px;">Neden Hızlı Öğren?</h2>
+        <p style="color: var(--text-muted); margin-bottom: 24px; line-height: 1.8;">
+          Çünkü zamanınız değerli. Kısa ve öz mikro eğitimlerle hızlıca konuya girebilir, ihtiyacınız olan bilgiye doğrudan ulaşabilirsiniz. Karmaşık abonelik modelleri yok; sadece istediğiniz eğitimi seçer, satın alır ve ömür boyu erişim hakkı kazanırsınız. Destek ekibimiz, sorularınız için her zaman yanınızdadır.
+        </p>
+
+        <div class="card" style="padding: 32px; text-align: center; margin-top: 48px;">
+          <h3 style="margin-bottom: 12px;">@(ViewData["HakkimizdaBoxTitle"] ?? "Hemen Başlayın")</h3>
+          <p style="color: var(--text-muted); margin-bottom: 20px;">@(ViewData["HakkimizdaBoxText"] ?? "Eğitim kataloğumuzu inceleyin, ihtiyacınıza uygun eğitimi seçin ve öğrenmeye bugün başlayın.")</p>
+          <a asp-controller="Courses" asp-action="Index" class="btn btn-primary">Eğitimlere Göz At</a>
+        </div>
+      }
+    </div>
+  </div>
+</section>

@@ -1,0 +1,8 @@
+@model List<HizliOgren.Models.CategoryMenuDto>
+<ul class="dropdown-menu">
+  @foreach (var c in Model ?? new List<HizliOgren.Models.CategoryMenuDto>())
+  {
+    <li><a asp-controller="Courses" asp-action="Index" asp-route-cat="@c.Slug">@c.Name</a></li>
+  }
+  <li><a asp-controller="Courses" asp-action="Index">Tüm Kategoriler</a></li>
+</ul>

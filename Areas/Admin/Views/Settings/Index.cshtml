@@ -1,0 +1,225 @@
+@{
+  ViewData["Title"] = "Ayarlar";
+  var settings = ViewBag.Settings as Dictionary<string, string?>;
+  var categories = ViewBag.Categories as List<HizliOgren.Models.Category> ?? new List<HizliOgren.Models.Category>();
+  string Get(string key) => settings != null && settings.TryGetValue(key, out var v) ? (v ?? "") : "";
+}
+<div class="tabs" style="margin-bottom: 24px;">
+  <a href="#panel-genel" class="tab active">Genel</a>
+  <a href="#panel-paytr" class="tab">PayTR</a>
+  <a href="#panel-google" class="tab">Google Giriş</a>
+  <a href="#panel-hakkimizda" class="tab">Hakkımızda</a>
+  <a href="#panel-kategoriler" class="tab">Kategoriler</a>
+</div>
+
+<div class="card settings-panel" id="panel-genel" style="padding: 24px; max-width: 640px;">
+  <h2 style="font-size: 1.2rem; margin-bottom: 20px;">Genel Ayarlar</h2>
+  <form asp-action="General" method="post">
+    @Html.AntiForgeryToken()
+    <div class="form-group">
+      <label>Site Adı</label>
+      <input type="text" name="SiteName" class="form-control" value="@Get("SiteName")" placeholder="Hızlı Öğren" />
+    </div>
+    <div class="form-group">
+      <label>Site Açıklaması</label>
+      <textarea name="SiteDescription" class="form-control" rows="3" placeholder="Kısa açıklama">@Get("SiteDescription")</textarea>
+    </div>
+    <div class="form-group">
+      <label>Varsayılan Eğitim Fiyatı (₺)</label>
+      <input type="number" name="DefaultCoursePrice" class="form-control" value="@Get("DefaultCoursePrice")" min="0" placeholder="199" />
+    </div>
+    <div class="form-group">
+      <label>İletişim E-posta</label>
+      <input type="email" name="ContactEmail" class="form-control" value="@Get("ContactEmail")" />
+    </div>
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+  </form>
+</div>
+
+<div class="card settings-panel" id="panel-paytr" style="padding: 24px; max-width: 640px; margin-top: 24px;">
+  <h2 style="font-size: 1.2rem; margin-bottom: 20px;">PayTR Ödeme</h2>
+  <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">PayTR Merchant ID, Key ve Salt değerlerini girin. Ödeme sayfasında kullanılır.</p>
+  <form asp-action="PayTR" method="post">
+    @Html.AntiForgeryToken()
+    <div class="form-group">
+      <label>Merchant ID</label>
+      <input type="text" name="PayTR_MerchantId" class="form-control" value="@Get("PayTR_MerchantId")" />
+    </div>
+    <div class="form-group">
+      <label>Merchant Key</label>
+      <input type="password" name="PayTR_MerchantKey" class="form-control" value="@Get("PayTR_MerchantKey")" placeholder="Mevcut key değişmezse boş bırakın" />
+    </div>
+    <div class="form-group">
+      <label>Merchant Salt</label>
+      <input type="password" name="PayTR_MerchantSalt" class="form-control" value="@Get("PayTR_MerchantSalt")" placeholder="Mevcut salt değişmezse boş bırakın" />
+    </div>
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+  </form>
+</div>
+
+<div class="card settings-panel" id="panel-google" style="padding: 24px; max-width: 640px; margin-top: 24px;">
+  <h2 style="font-size: 1.2rem; margin-bottom: 20px;">Google ile Giriş</h2>
+  <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">Google OAuth Client ID ve Client Secret. Uygulama yeniden başlatıldığında etkin olur.</p>
+  <form asp-action="Google" method="post">
+    @Html.AntiForgeryToken()
+    <div class="form-group">
+      <label>Client ID</label>
+      <input type="text" name="Google_ClientId" class="form-control" value="@Get("Google_ClientId")" />
+    </div>
+    <div class="form-group">
+      <label>Client Secret</label>
+      <input type="password" name="Google_ClientSecret" class="form-control" value="@Get("Google_ClientSecret")" />
+    </div>
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+  </form>
+</div>
+
+<div class="card settings-panel" id="panel-hakkimizda" style="padding: 24px; max-width: 900px; margin-top: 24px;">
+  <h2 style="font-size: 1.2rem; margin-bottom: 20px;">Hakkımızda sayfası içeriği</h2>
+  <p style="color: var(--text-muted); margin-bottom: 16px; font-size: 0.9rem;">Bu metin sitedeki Hakkımızda sayfasında gösterilir. CKEditor ile biçimlendirme yapabilirsiniz.</p>
+  <form asp-action="AboutPage" method="post" id="form-about">
+    @Html.AntiForgeryToken()
+    <div class="form-group">
+      <textarea name="AboutPageContent" id="AboutPageContent" style="min-height: 320px;"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+  </form>
+  <script>var aboutContentInit = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Get("AboutPageContent") ?? ""));</script>
+</div>
+
+<div class="card settings-panel" id="panel-kategoriler" style="padding: 24px; max-width: 720px; margin-top: 24px;">
+  <h2 style="font-size: 1.2rem; margin-bottom: 20px;">Eğitim Kategorileri</h2>
+  <form asp-action="CategoryAdd" method="post" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 24px;">
+    @Html.AntiForgeryToken()
+    <div class="form-group" style="margin-bottom: 0; flex: 1; min-width: 180px;">
+      <label>Yeni kategori adı</label>
+      <input type="text" name="Name" class="form-control" placeholder="Örn: İletişim" required />
+    </div>
+    <button type="submit" class="btn btn-primary">Ekle</button>
+  </form>
+  <p style="color: var(--text-muted); font-size: 0.9rem; margin: -12px 0 16px 0;">URL adresi (slug) kategori adından otomatik üretilir.</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 60px;">Sıra</th>
+          <th>Kategori Adı</th>
+          <th style="width: 180px;">İşlem</th>
+        </tr>
+      </thead>
+      <tbody>
+        @{ var catList = categories; var count = catList.Count; }
+        @for (var i = 0; i < count; i++)
+        {
+          var c = catList[i];
+          <tr>
+            <td>@c.SortOrder</td>
+            <td>@c.Name</td>
+            <td>
+              <form asp-action="CategoryMove" method="post" style="display:inline;">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@c.Id" />
+                <input type="hidden" name="direction" value="up" />
+                <button type="submit" class="btn btn-ghost" style="padding: 4px 8px; font-size: 0.85rem;" @(i == 0 ? "disabled" : "") title="Yukarı">↑</button>
+              </form>
+              <form asp-action="CategoryMove" method="post" style="display:inline;">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@c.Id" />
+                <input type="hidden" name="direction" value="down" />
+                <button type="submit" class="btn btn-ghost" style="padding: 4px 8px; font-size: 0.85rem;" @(i == count - 1 ? "disabled" : "") title="Aşağı">↓</button>
+              </form>
+              <form asp-action="CategoryDelete" method="post" style="display:inline;" onsubmit="return confirm('Bu kategoriyi silmek istediğinize emin misiniz?');">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@c.Id" />
+                <button type="submit" class="btn btn-ghost" style="padding: 6px 12px; font-size: 0.85rem;">Kaldır</button>
+              </form>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+(function() {
+  var panels = document.querySelectorAll('.settings-panel');
+  var tabLinks = document.querySelectorAll('.tab');
+  function showPanel(panelId) {
+    if (!panelId) return;
+    panels.forEach(function(p) { p.style.display = p.id === panelId ? 'block' : 'none'; });
+    tabLinks.forEach(function(t) {
+      t.classList.toggle('active', (t.getAttribute('href') || '').replace('#','') === panelId);
+    });
+  }
+  // Sayfa yüklendiğinde hash veya query'deki sekmeyi aç
+  var fromQuery = '@(Context.Request.Query["tab"].FirstOrDefault() ?? "")';
+  var panelId = (typeof location !== 'undefined' && location.hash && location.hash.length > 1)
+    ? location.hash.replace('#','')
+    : (fromQuery || 'panel-genel');
+  if (fromQuery && !location.hash) {
+    location.hash = '#' + fromQuery;
+    if (history.replaceState && location.search) history.replaceState(null, '', location.pathname + location.hash);
+  }
+  showPanel(panelId);
+  tabLinks.forEach(function(t) {
+    t.addEventListener('click', function(e) {
+      e.preventDefault();
+      var id = this.getAttribute('href');
+      if (!id) return;
+      var pid = id.replace('#','');
+      location.hash = id;
+      showPanel(pid);
+    });
+  });
+})();
+</script>
+@section Scripts {
+  <script src="https://cdn.jsdelivr.net/npm/ckeditor5-build-classic-complete@0.2.0/build/ckeditor.js" crossorigin="anonymous"></script>
+  <script>
+  (function() {
+    var uploadUrl = '@Url.Action("Image", "Upload", new { area = "" })';
+    var tokenEl = document.querySelector('input[name="__RequestVerificationToken"]');
+    var token = tokenEl ? tokenEl.value : '';
+    function makeUploadAdapter(loader) {
+      return {
+        upload: function() {
+          return loader.file.then(function(file) {
+            var data = new FormData();
+            data.append('upload', file);
+            if (token) data.append('__RequestVerificationToken', token);
+            return fetch(uploadUrl, { method: 'POST', body: data, credentials: 'same-origin' })
+              .then(function(r) { return r.json(); })
+              .then(function(res) {
+                if (res.error) throw new Error(res.error.message || 'Yükleme hatası');
+                return { default: res.url };
+              });
+          });
+        }
+      };
+    }
+    var editorConfig = {
+      toolbar: ['heading', '|', 'bold', 'italic', 'underline', '|', 'alignment:left', 'alignment:center', 'alignment:right', 'alignment:justify', '|', 'link', 'imageUpload', 'mediaEmbed', 'blockQuote', '|', 'numberedList', 'bulletedList', '|', 'insertTable'],
+      heading: { options: [{ model: 'paragraph', title: 'Paragraf', class: 'ck-heading_paragraph' }, { model: 'heading2', view: 'h2', title: 'Başlık 2', class: 'ck-heading_heading2' }, { model: 'heading3', view: 'h3', title: 'Başlık 3', class: 'ck-heading_heading3' }] },
+      image: { toolbar: ['imageStyle:full', 'imageStyle:side', '|', 'imageTextAlternative'] },
+      mediaEmbed: { previewsInData: true },
+      link: { addTargetToExternalLinks: true, decorators: [{ mode: 'manual', label: 'Yeni sekmede aç', attributes: { target: '_blank', rel: 'noopener noreferrer' } }] }
+    };
+    var contentEditor = null;
+    var el = document.querySelector('#AboutPageContent');
+    if (el) {
+      el.value = (typeof aboutContentInit !== 'undefined' ? aboutContentInit : '') || '';
+      if (typeof ClassicEditor !== 'undefined') {
+      ClassicEditor.create(el, editorConfig).then(function(editor) {
+        var fileRepo = editor.plugins.get('FileRepository');
+        if (fileRepo) fileRepo.createUploadAdapter = makeUploadAdapter;
+        contentEditor = editor;
+      }).catch(function(err) { console.error(err); });
+      document.getElementById('form-about') && document.getElementById('form-about').addEventListener('submit', function() {
+        if (contentEditor) contentEditor.updateSourceElement();
+      });
+      }
+    }
+  })();
+  </script>
+}

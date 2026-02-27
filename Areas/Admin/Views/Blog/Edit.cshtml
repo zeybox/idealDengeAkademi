@@ -1,0 +1,131 @@
+@model HizliOgren.Models.BlogPost
+@{
+  ViewData["Title"] = Model.Id == 0 ? "Yeni Yazı" : "Yazı Düzenle";
+}
+<div class="card" style="padding: 24px; max-width: 960px;">
+  <h2>@ViewData["Title"]</h2>
+  <form asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="AuthorId" />
+    <div class="form-row" style="display: flex; gap: 24px; flex-wrap: wrap;">
+      <div style="flex: 1; min-width: 200px;">
+        <div class="form-group">
+          <label asp-for="Title">📌 Başlık</label>
+          <input asp-for="Title" class="form-control" required maxlength="300" id="Title" />
+          <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+      </div>
+      <div class="form-group" style="min-width: 200px;">
+        <label asp-for="ImageUrl">🖼️ Kapak resmi</label>
+        <input type="hidden" asp-for="ImageUrl" id="ImageUrl" />
+        <div style="border: 1px dashed var(--border); border-radius: var(--radius-sm); padding: 12px; background: var(--bg-soft); min-height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+          <img id="cover-preview" src="@(Model.ImageUrl ?? "")" alt="Kapak" style="max-width: 100%; max-height: 120px; object-fit: contain; display: @(string.IsNullOrEmpty(Model.ImageUrl) ? "none" : "block"); margin-bottom: 8px;" />
+          <span id="cover-placeholder" style="font-size: 0.85rem; color: var(--text-muted); display: @(string.IsNullOrEmpty(Model.ImageUrl) ? "block" : "none");">Kapak yok</span>
+          <button type="button" id="cover-upload-btn" class="btn btn-ghost" style="margin-top: 8px; font-size: 0.9rem;">📷 Resim yükle</button>
+          <input type="file" id="cover-upload" accept=".jpg,.jpeg,.png,.gif,.webp" style="display: none;" />
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label asp-for="Excerpt">📋 Özet</label>
+      <textarea asp-for="Excerpt" class="form-control" rows="3" placeholder="Liste ve makale sayfasında görünen kısa özet."></textarea>
+    </div>
+    <div class="form-group">
+      <label asp-for="Content">📝 İçerik</label>
+      <textarea asp-for="Content" id="Content" name="Content" class="form-control" rows="12"></textarea>
+    </div>
+    <div class="form-group">
+      <label><input type="checkbox" asp-for="IsPublished" /> 🌐 Yayında</label>
+    </div>
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+    <a asp-action="Index" class="btn btn-ghost">İptal</a>
+  </form>
+</div>
+@section Scripts {
+  <partial name="_ValidationScriptsPartial" />
+  <script src="https://cdn.jsdelivr.net/npm/ckeditor5-build-classic-complete@0.2.0/build/ckeditor.js" crossorigin="anonymous"></script>
+  <script>
+    (function() {
+      var uploadUrl = '@Url.Action("Image", "Upload", new { area = "" })';
+      var tokenEl = document.querySelector('input[name="__RequestVerificationToken"]');
+      var token = tokenEl ? tokenEl.value : '';
+      var coverBtn = document.getElementById('cover-upload-btn');
+      var coverInput = document.getElementById('cover-upload');
+      var coverPreview = document.getElementById('cover-preview');
+      var coverPlaceholder = document.getElementById('cover-placeholder');
+      var imageUrlInput = document.getElementById('ImageUrl');
+      if (coverBtn && coverInput) {
+        coverBtn.addEventListener('click', function() { coverInput.click(); });
+        coverInput.addEventListener('change', function() {
+          var file = coverInput.files && coverInput.files[0];
+          if (!file) return;
+          var data = new FormData();
+          data.append('upload', file);
+          if (token) data.append('__RequestVerificationToken', token);
+          coverBtn.disabled = true;
+          fetch(uploadUrl, { method: 'POST', body: data, credentials: 'same-origin' })
+            .then(function(r) { return r.json(); })
+            .then(function(res) {
+              if (res.error) throw new Error(res.error.message);
+              if (imageUrlInput) imageUrlInput.value = res.url;
+              if (coverPreview) { coverPreview.src = res.url; coverPreview.style.display = 'block'; }
+              if (coverPlaceholder) coverPlaceholder.style.display = 'none';
+            })
+            .catch(function(err) { alert(err.message || 'Yükleme hatası'); })
+            .finally(function() { coverBtn.disabled = false; coverInput.value = ''; });
+        });
+      }
+      var editorConfig = {
+        toolbar: ['heading', '|', 'bold', 'italic', 'underline', '|', 'alignment:left', 'alignment:center', 'alignment:right', 'alignment:justify', '|', 'link', 'imageUpload', 'mediaEmbed', 'blockQuote', '|', 'numberedList', 'bulletedList', '|', 'insertTable'],
+        heading: { options: [{ model: 'paragraph', title: 'Paragraf', class: 'ck-heading_paragraph' }, { model: 'heading2', view: 'h2', title: 'Başlık 2', class: 'ck-heading_heading2' }, { model: 'heading3', view: 'h3', title: 'Başlık 3', class: 'ck-heading_heading3' }] },
+        image: { toolbar: ['imageStyle:full', 'imageStyle:side', '|', 'imageTextAlternative'] },
+        mediaEmbed: { previewsInData: true },
+        link: {
+          addTargetToExternalLinks: true,
+          decorators: [{ mode: 'manual', label: 'Yeni sekmede aç', attributes: { target: '_blank', rel: 'noopener noreferrer' } }]
+        }
+      };
+      function makeUploadAdapter(loader) {
+        return {
+          upload: function() {
+            return loader.file.then(function(file) {
+              var data = new FormData();
+              data.append('upload', file);
+              if (token) data.append('__RequestVerificationToken', token);
+              return fetch(uploadUrl, { method: 'POST', body: data, credentials: 'same-origin' })
+                .then(function(r) { return r.json(); })
+                .then(function(res) {
+                  if (res.error) throw new Error(res.error.message || 'Yükleme hatası');
+                  return { default: res.url };
+                });
+            });
+          }
+        };
+      }
+      function ensureLinksBlank(html) {
+        if (!html) return html;
+        return html.replace(/<a\s+([^>]*)>/gi, function(match, attrs) {
+          if (/\btarget\s*=/i.test(attrs)) return match;
+          return '<a target="_blank" ' + attrs + '>';
+        });
+      }
+      var blogForm = document.querySelector('form');
+      var contentEditor = null;
+      ClassicEditor.create(document.querySelector('#Content'), editorConfig).then(function(editor) {
+        var fileRepo = editor.plugins.get('FileRepository');
+        if (fileRepo) fileRepo.createUploadAdapter = makeUploadAdapter;
+        contentEditor = editor;
+      }).catch(function(err) { console.error(err); });
+      if (blogForm) {
+        blogForm.addEventListener('submit', function(e) {
+          if (contentEditor) {
+            e.preventDefault();
+            contentEditor.setData(ensureLinksBlank(contentEditor.getData()));
+            setTimeout(function() { blogForm.submit(); }, 50);
+          }
+        });
+      }
+    })();
+  </script>
+}

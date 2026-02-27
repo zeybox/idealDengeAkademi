@@ -1,0 +1,196 @@
+@model HizliOgren.Models.Course
+@{
+  ViewData["Title"] = Model.Id == 0 ? "Yeni Eğitim" : "Eğitim Düzenle";
+  var categories = ViewBag.Categories as Microsoft.AspNetCore.Mvc.Rendering.SelectList;
+}
+<div class="card" style="padding: 24px; max-width: 1248px;">
+  <h2>@ViewData["Title"]</h2>
+  <form asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="InstructorId" />
+    <div class="form-row form-row-title-cover">
+      <div class="form-row-left">
+        <div class="form-group">
+          <label asp-for="Title">📌 Eğitim Adı</label>
+          <input asp-for="Title" class="form-control" required />
+          <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+          <label asp-for="CategoryId">📁 Kategori</label>
+          <select asp-for="CategoryId" class="form-control" asp-items="categories" required></select>
+        </div>
+      </div>
+      <div class="form-group form-group-cover">
+        <label asp-for="ImageUrl">🖼️ Eğitim kapak resmi</label>
+        <input type="hidden" asp-for="ImageUrl" id="ImageUrl" />
+        <div class="cover-upload-box" style="border: 1px dashed var(--border); border-radius: var(--radius-sm); padding: 12px; background: var(--bg-soft); min-height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+          <img id="cover-preview" src="@(Model.ImageUrl ?? "")" alt="Kapak" style="max-width: 100%; max-height: 120px; object-fit: contain; display: @(string.IsNullOrEmpty(Model.ImageUrl) ? "none" : "block"); margin-bottom: 8px;" />
+          <span id="cover-placeholder" style="font-size: 0.85rem; color: var(--text-muted); display: @(string.IsNullOrEmpty(Model.ImageUrl) ? "block" : "none");">Kapak resmi yok</span>
+          <button type="button" id="cover-upload-btn" class="btn btn-ghost" style="margin-top: 8px; font-size: 0.9rem;">📷 Resim yükle</button>
+          <input type="file" id="cover-upload" accept=".jpg,.jpeg,.png,.gif,.webp" style="display: none;" />
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label asp-for="Description">📝 Açıklama</label>
+      <textarea asp-for="Description" id="Description" name="Description" class="form-control" rows="4"></textarea>
+    </div>
+    <div class="form-group">
+      <label asp-for="Highlights">📌 Bu eğitimde neler var?</label>
+      <textarea asp-for="Highlights" class="form-control" rows="5" placeholder="Her satıra bir madde yazın. Detay sayfasında liste olarak gösterilir."></textarea>
+      <p class="form-text" style="margin-top: 4px;">Her satır bir madde olacak şekilde yazın (örn: Çatışma türleri ve nedenleri).</p>
+    </div>
+    <div class="form-group">
+      <label asp-for="ContentSummary">📋 İçerik özeti açıklaması</label>
+      <textarea asp-for="ContentSummary" class="form-control" rows="2" placeholder="İsteğe bağlı. Detay sayfasında İçerik Özeti başlığının altında gösterilir."></textarea>
+    </div>
+    <div class="form-group">
+      <label asp-for="PaidContent">🔒 Eğitim içeriği (Ücretli Kısım)</label>
+      <textarea asp-for="PaidContent" id="PaidContent" name="PaidContent" class="form-control" rows="4"></textarea>
+      <p class="form-text" style="margin-top: 8px;">Sadece eğitimi satın alanlar bu içeriği görebilir.</p>
+      <p class="form-text" style="margin-top: 4px;">
+        <button type="button" id="pdf-upload-btn" class="btn btn-ghost" style="font-size: 0.9rem;">📄 PDF yükle ve bağlantı ekle</button>
+        <input type="file" id="pdf-upload" accept=".pdf" style="display: none;">
+      </p>
+    </div>
+    <div class="form-group">
+      <label asp-for="Price">💰 Fiyat (TL)</label>
+      <input asp-for="Price" type="number" step="0.01" min="0" class="form-control" required />
+      <span asp-validation-for="Price" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+      <label><input type="checkbox" asp-for="IsPublished" /> 🌐 Yayında</label>
+    </div>
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+    <a asp-action="Index" class="btn btn-ghost">İptal</a>
+  </form>
+</div>
+@section Scripts {
+  <partial name="_ValidationScriptsPartial" />
+  <script src="https://cdn.jsdelivr.net/npm/ckeditor5-build-classic-complete@0.2.0/build/ckeditor.js" crossorigin="anonymous"></script>
+  <script>
+      (function() {
+      var uploadUrl = '@Url.Action("Image", "Upload", new { area = "" })';
+      var pdfUploadUrl = '@Url.Action("Pdf", "Upload", new { area = "" })';
+      var tokenEl = document.querySelector('input[name="__RequestVerificationToken"]');
+      var token = tokenEl ? tokenEl.value : '';
+      var coverBtn = document.getElementById('cover-upload-btn');
+      var coverInput = document.getElementById('cover-upload');
+      var coverPreview = document.getElementById('cover-preview');
+      var coverPlaceholder = document.getElementById('cover-placeholder');
+      var imageUrlInput = document.getElementById('ImageUrl');
+      if (coverBtn && coverInput) {
+        coverBtn.addEventListener('click', function() { coverInput.click(); });
+        coverInput.addEventListener('change', function() {
+          var file = coverInput.files && coverInput.files[0];
+          if (!file) return;
+          var data = new FormData();
+          data.append('upload', file);
+          if (token) data.append('__RequestVerificationToken', token);
+          coverBtn.disabled = true;
+          fetch(uploadUrl, { method: 'POST', body: data, credentials: 'same-origin' })
+            .then(function(r) { return r.json(); })
+            .then(function(res) {
+              if (res.error) throw new Error(res.error.message);
+              if (imageUrlInput) imageUrlInput.value = res.url;
+              if (coverPreview) { coverPreview.src = res.url; coverPreview.style.display = 'block'; }
+              if (coverPlaceholder) coverPlaceholder.style.display = 'none';
+            })
+            .catch(function(err) { alert(err.message || 'Yükleme hatası'); })
+            .finally(function() { coverBtn.disabled = false; coverInput.value = ''; });
+        });
+      }
+      var editorConfig = {
+        toolbar: ['heading', '|', 'bold', 'italic', 'underline', '|', 'alignment:left', 'alignment:center', 'alignment:right', 'alignment:justify', '|', 'link', 'imageUpload', 'mediaEmbed', 'blockQuote', '|', 'numberedList', 'bulletedList', '|', 'insertTable'],
+        heading: { options: [{ model: 'paragraph', title: 'Paragraf', class: 'ck-heading_paragraph' }, { model: 'heading2', view: 'h2', title: 'Başlık 2', class: 'ck-heading_heading2' }, { model: 'heading3', view: 'h3', title: 'Başlık 3', class: 'ck-heading_heading3' }] },
+        image: { toolbar: ['imageStyle:full', 'imageStyle:side', '|', 'imageTextAlternative'] },
+        mediaEmbed: { previewsInData: true },
+        link: {
+          addTargetToExternalLinks: true,
+          decorators: [
+            {
+              mode: 'manual',
+              label: 'Yeni sekmede aç',
+              attributes: { target: '_blank', rel: 'noopener noreferrer' }
+            }
+          ]
+        }
+      };
+      function makeUploadAdapter(loader) {
+        return {
+          upload: function() {
+            return loader.file.then(function(file) {
+              var data = new FormData();
+              data.append('upload', file);
+              if (token) data.append('__RequestVerificationToken', token);
+              return fetch(uploadUrl, { method: 'POST', body: data, credentials: 'same-origin' })
+                .then(function(r) { return r.json(); })
+                .then(function(res) {
+                  if (res.error) throw new Error(res.error.message || 'Yükleme hatası');
+                  return { default: res.url };
+                });
+            });
+          }
+        };
+      }
+      function escapeHtml(s) {
+        var d = document.createElement('div');
+        d.textContent = s;
+        return d.innerHTML;
+      }
+      function ensureLinksBlank(html) {
+        if (!html) return html;
+        return html.replace(/<a\s+([^>]*)>/gi, function(match, attrs) {
+          if (/\btarget\s*=/i.test(attrs)) return match;
+          return '<a target="_blank" ' + attrs + '>';
+        });
+      }
+      var courseForm = document.querySelector('form');
+      var editorsList = [];
+      ClassicEditor.create(document.querySelector('#Description'), editorConfig).then(function(editor) {
+        var fileRepo = editor.plugins.get('FileRepository');
+        if (fileRepo) fileRepo.createUploadAdapter = makeUploadAdapter;
+        editorsList.push(editor);
+      }).catch(function(err) { console.error(err); });
+      ClassicEditor.create(document.querySelector('#PaidContent'), editorConfig).then(function(editor) {
+        var fileRepo = editor.plugins.get('FileRepository');
+        if (fileRepo) fileRepo.createUploadAdapter = makeUploadAdapter;
+        var pdfBtn = document.getElementById('pdf-upload-btn');
+        var pdfInput = document.getElementById('pdf-upload');
+        if (pdfBtn && pdfInput) {
+          pdfBtn.addEventListener('click', function() { pdfInput.click(); });
+          pdfInput.addEventListener('change', function() {
+            var file = pdfInput.files && pdfInput.files[0];
+            if (!file) return;
+            var data = new FormData();
+            data.append('file', file);
+            if (token) data.append('__RequestVerificationToken', token);
+            pdfBtn.disabled = true;
+            fetch(pdfUploadUrl, { method: 'POST', body: data, credentials: 'same-origin' })
+              .then(function(r) { return r.json(); })
+              .then(function(res) {
+                if (res.error) throw new Error(res.error.message || 'Yükleme hatası');
+                var name = res.name || file.name.replace(/\.pdf$/i, '') || 'PDF indir';
+                var html = '<p><a href="' + res.url + '">📄 ' + escapeHtml(name) + '</a></p>';
+                editor.setData(editor.getData() + html);
+              })
+              .catch(function(err) { alert(err.message || 'PDF yüklenemedi.'); })
+              .finally(function() { pdfBtn.disabled = false; pdfInput.value = ''; });
+          });
+        }
+        editorsList.push(editor);
+      }).catch(function(err) { console.error(err); });
+      if (courseForm) {
+        courseForm.addEventListener('submit', function(e) {
+          if (editorsList.length === 0) return;
+          e.preventDefault();
+          editorsList.forEach(function(ed) {
+            ed.setData(ensureLinksBlank(ed.getData()));
+          });
+          setTimeout(function() { courseForm.submit(); }, 50);
+        });
+      }
+    })();
+  </script>
+}

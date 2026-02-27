@@ -1,0 +1,155 @@
+@model HizliOgren.Models.Course
+@{
+  ViewData["Title"] = Model.Title;
+  var hasAccess = ViewBag.HasAccess as bool? ?? false;
+  var items = Model.CurriculumItems ?? new List<HizliOgren.Models.CurriculumItem>();
+  var totalVideoMinutes = items.Where(x => x.Type == "video").Sum(x => x.DurationMinutes ?? 0);
+  var pdfCount = items.Count(x => x.Type == "pdf");
+  var articleCount = items.Count(x => x.Type == "article");
+}
+<section class="section">
+  <div class="container">
+    <nav class="breadcrumb">
+      <a asp-controller="Home" asp-action="Index">Ana Sayfa</a>
+      <span>/</span>
+      <a asp-controller="Courses" asp-action="Index">Eğitimler</a>
+      <span>/</span>
+      <span>@Model.Title</span>
+    </nav>
+
+    <div class="course-detail-hero">
+      <div class="course-detail-info">
+        <img src="@(Model.ImageUrl ?? "https://placehold.co/800x450/e0f2f1/0f766e?text=" + Uri.EscapeDataString(Model.Title))" alt="@Model.Title" style="width:100%;border-radius:var(--radius);margin-bottom:24px;" />
+        <h1>@Model.Title</h1>
+        <div class="course-detail-meta">
+          <span>📂 @Model.Category?.Name</span>
+          @if (totalVideoMinutes > 0) { <span>⏱ Toplam @totalVideoMinutes dk video</span> }
+          @if (pdfCount > 0) { <span>📄 @pdfCount PDF</span> }
+          @if (articleCount > 0) { <span>📝 @articleCount Makale</span> }
+          @if (Model.Instructor != null)
+          {
+            <a asp-controller="Instructors" asp-action="Profile" asp-route-id="@Model.Instructor.Id" style="display: inline-flex; align-items: center; gap: 6px; color: inherit; text-decoration: none;">
+              @if (!string.IsNullOrWhiteSpace(Model.Instructor.AvatarUrl))
+              { <img src="@Model.Instructor.AvatarUrl" alt="" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; vertical-align: middle;" /> }
+              else
+              { <span style="display: inline-flex; width: 24px; height: 24px; background: var(--bg-soft); border-radius: 50%; align-items: center; justify-content: center; font-size: 0.75rem;">👤</span> }
+              <span>@Model.Instructor.FullName</span>
+            </a>
+          }
+          else
+          {
+            <span>👤 Eğitmen</span>
+          }
+        </div>
+        <div class="course-description" style="color: var(--text-muted); margin-bottom: 24px; line-height: 1.7;">@Html.Raw(Model.Description ?? "Bu eğitimde video, PDF ve makalelerle zengin içerik bulunmaktadır.")</div>
+        <h3 style="font-size: 1.15rem; margin-bottom: 12px;">Bu eğitimde neler var?</h3>
+        @if (!string.IsNullOrWhiteSpace(Model.Highlights))
+        {
+          var highlights = Model.Highlights.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+          <ul style="color: var(--text-muted); padding-left: 20px; margin-bottom: 24px;">
+            @foreach (var line in highlights)
+            {
+              <li>@line.Trim()</li>
+            }
+          </ul>
+        }
+        else
+        {
+          <p style="color: var(--text-muted); margin-bottom: 24px;">Bu eğitimde video, PDF ve makalelerle zengin içerik bulunmaktadır.</p>
+        }
+        <h3 style="font-size: 1.15rem; margin-bottom: 12px;">İçerik Özeti</h3>
+        @if (!string.IsNullOrWhiteSpace(Model.ContentSummary))
+        {
+          <p style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 12px;">@Model.ContentSummary</p>
+        }
+        <ul class="curriculum-list">
+          @foreach (var item in items)
+          {
+            var suffix = item.Type == "video" && item.DurationMinutes.HasValue ? " (" + item.DurationMinutes + " dk)" : "";
+            <li><span class="icon">@(item.Type == "video" ? "▶" : item.Type == "pdf" ? "📄" : "📝")</span> @item.Title@suffix</li>
+          }
+        </ul>
+      </div>
+
+      <aside class="course-detail-sidebar">
+        <div class="course-price-box">
+          <div class="price">₺@Model.Price.ToString("N0") <small>/ tek seferlik, süresiz erişim</small></div>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin: 8px 0 20px;">Satın alınca video, PDF ve makalelere süresiz erişirsiniz.</p>
+          @if (hasAccess)
+          {
+            <a asp-action="Watch" asp-route-id="@Model.Id" class="btn btn-primary" style="width: 100%; margin-bottom: 12px;">Eğitimi İzle</a>
+            <a asp-controller="Dashboard" asp-action="Index" class="btn btn-outline" style="width: 100%;">Eğitimlerime Git</a>
+          }
+          else
+          {
+            <form asp-controller="Checkout" asp-action="AddToCart" method="post" style="margin-bottom: 12px;">
+              @Html.AntiForgeryToken()
+              <input type="hidden" name="courseId" value="@Model.Id" />
+              <button type="submit" class="btn btn-primary" style="width: 100%;">Sepete Ekle</button>
+            </form>
+            <a asp-controller="Dashboard" asp-action="Index" class="btn btn-outline" style="width: 100%;">Eğitimlerime Git</a>
+          }
+        </div>
+        @if (Model.Instructor != null)
+        {
+          <a asp-controller="Instructors" asp-action="Profile" asp-route-id="@Model.Instructor.Id" style="display: flex; align-items: center; gap: 12px; padding: 12px; margin: 20px 0; border-radius: var(--radius-sm); border: 1px solid var(--border); text-decoration: none; color: inherit;">
+            @if (!string.IsNullOrWhiteSpace(Model.Instructor.AvatarUrl))
+            {
+              <img src="@Model.Instructor.AvatarUrl" alt="@Model.Instructor.FullName" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; flex-shrink: 0;" />
+            }
+            else
+            {
+              <div style="width: 48px; height: 48px; background: var(--bg-soft); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0;">👩‍🏫</div>
+            }
+            <div style="min-width: 0;">
+              <strong style="font-size: 0.95rem;">@Model.Instructor.FullName</strong>
+              @if (!string.IsNullOrWhiteSpace(Model.Instructor.Title))
+              {
+                <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);">@Model.Instructor.Title</p>
+              }
+              <span style="font-size: 0.8rem; color: var(--primary);">Profil →</span>
+            </div>
+          </a>
+        }
+        <h4 style="margin: 24px 0 12px; font-size: 1rem;">İçerik Özeti</h4>
+        @if (!string.IsNullOrWhiteSpace(Model.ContentSummary))
+        {
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">@Model.ContentSummary</p>
+        }
+        <ul class="curriculum-list">
+          @foreach (var item in items)
+          {
+            var suffix = item.Type == "video" && item.DurationMinutes.HasValue ? " (" + item.DurationMinutes + " dk)" : "";
+            <li><span class="icon">@(item.Type == "video" ? "▶" : item.Type == "pdf" ? "📄" : "📝")</span> @item.Title@suffix</li>
+          }
+        </ul>
+      </aside>
+    </div>
+
+    @if (Model.Instructor != null)
+    {
+      <a asp-controller="Instructors" asp-action="Profile" asp-route-id="@Model.Instructor.Id" class="card" style="padding: 24px; margin-top: 32px; text-decoration: none; color: inherit; display: block; transition: box-shadow 0.2s;" onmouseover="this.style.boxShadow='var(--shadow-lg)'" onmouseout="this.style.boxShadow='var(--shadow)'">
+        <h3 style="margin-bottom: 16px;">Eğitmen</h3>
+        <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+          @if (!string.IsNullOrWhiteSpace(Model.Instructor.AvatarUrl))
+          {
+            <img src="@Model.Instructor.AvatarUrl" alt="@Model.Instructor.FullName" style="width: 72px; height: 72px; object-fit: cover; border-radius: 50%; border: 2px solid var(--border);" />
+          }
+          else
+          {
+            <div style="width: 72px; height: 72px; background: var(--bg-soft); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem;">👩‍🏫</div>
+          }
+          <div style="flex: 1; min-width: 0;">
+            <strong>@Model.Instructor.FullName</strong>
+            @if (!string.IsNullOrWhiteSpace(Model.Instructor.Title))
+            {
+              <p style="color: var(--primary); font-size: 0.9rem; margin: 2px 0 4px 0;">@Model.Instructor.Title</p>
+            }
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin: 0;">@(string.IsNullOrWhiteSpace(Model.Instructor.Bio) ? "Eğitmen hakkında bilgi için tıklayın." : (Model.Instructor.Bio.Length > 180 ? Model.Instructor.Bio.Substring(0, 180) + "…" : Model.Instructor.Bio))</p>
+            <span style="font-size: 0.9rem; color: var(--primary); margin-top: 8px; display: inline-block;">Eğitmen profilini görüntüle →</span>
+          </div>
+        </div>
+      </a>
+    }
+  </div>
+</section>

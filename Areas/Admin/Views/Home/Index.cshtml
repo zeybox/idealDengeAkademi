@@ -1,0 +1,54 @@
+@{
+  ViewData["Title"] = "Yönetim Paneli";
+  var coursesCount = ViewBag.CoursesCount as int? ?? 0;
+  var usersCount = ViewBag.UsersCount as int? ?? 0;
+  var totalSales = ViewBag.TotalSales as decimal? ?? 0;
+  var blogCount = ViewBag.BlogCount as int? ?? 0;
+  var recentOrders = ViewBag.RecentOrders as List<HizliOgren.Models.Order> ?? new List<HizliOgren.Models.Order>();
+}
+<div class="stat-cards">
+  <div class="stat-card">
+    <h4>Toplam Eğitim</h4>
+    <div class="value">@coursesCount</div>
+  </div>
+  <div class="stat-card">
+    <h4>Kayıtlı Kullanıcı</h4>
+    <div class="value">@usersCount</div>
+  </div>
+  <div class="stat-card">
+    <h4>Toplam Satış</h4>
+    <div class="value">₺@totalSales.ToString("N0")</div>
+  </div>
+  <div class="stat-card">
+    <h4>Blog Yazısı</h4>
+    <div class="value">@blogCount</div>
+  </div>
+</div>
+
+<div class="card" style="padding: 24px; margin-bottom: 24px;">
+  <h2 style="font-size: 1.25rem; margin-bottom: 20px;">Son Siparişler</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Sipariş No</th>
+          <th>Kullanıcı</th>
+          <th>Tutar</th>
+          <th>Durum</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach (var o in recentOrders)
+        {
+          <tr>
+            <td>#@o.Id</td>
+            <td>@o.User?.Email</td>
+            <td>₺@o.Total.ToString("N0")</td>
+            <td><span class="badge @(o.Status == "Paid" ? "badge-success" : "badge-warning")">@(o.Status == "Paid" ? "Ödendi" : o.Status == "Pending" ? "Beklemede" : o.Status == "Failed" ? "Başarısız" : o.Status == "Refunded" ? "İade Edildi" : o.Status)</span></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  @if (recentOrders.Count == 0) { <p style="color: var(--text-muted);">Henüz sipariş yok.</p> }
+</div>

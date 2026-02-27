@@ -1,0 +1,70 @@
+@model HizliOgren.Models.HeroSlide
+@{
+  ViewData["Title"] = Model.Id == 0 ? "Yeni slayt" : "Slayt düzenle";
+}
+<div class="card" style="padding: 24px; max-width: 720px;">
+  <h2>@ViewData["Title"]</h2>
+  <form asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" value="@Model.Id" />
+    <div class="form-group">
+      <label>Başlık</label>
+      <input type="text" name="Title" class="form-control" value="@Model.Title" required maxlength="300" placeholder="Örn: Başarıya Giden En Hızlı Yol" />
+    </div>
+    <div class="form-group">
+      <label>Metin</label>
+      <textarea name="Text" class="form-control" rows="3" maxlength="1000" placeholder="Slayt altındaki kısa açıklama">@Model.Text</textarea>
+    </div>
+    <div class="form-group">
+      <label>Görsel</label>
+      <input type="hidden" name="ImageUrl" id="ImageUrl" value="@Model.ImageUrl" />
+      <div style="border: 1px dashed var(--border); border-radius: var(--radius-sm); padding: 12px; background: var(--bg-soft); min-height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <img id="slide-preview" src="@(Model.ImageUrl ?? "")" alt="" style="max-width: 100%; max-height: 180px; object-fit: contain; display: @(string.IsNullOrEmpty(Model.ImageUrl) ? "none" : "block"); margin-bottom: 8px;" />
+        <span id="slide-placeholder" style="font-size: 0.85rem; color: var(--text-muted); display: @(string.IsNullOrEmpty(Model.ImageUrl) ? "block" : "none");">Görsel yok</span>
+        <button type="button" id="slide-upload-btn" class="btn btn-ghost" style="margin-top: 8px; font-size: 0.9rem;">📷 Görsel yükle</button>
+        <input type="file" id="slide-upload" accept=".jpg,.jpeg,.png,.gif,.webp" style="display: none;" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Görsel alt metni (erişilebilirlik)</label>
+      <input type="text" name="ImageAlt" class="form-control" value="@Model.ImageAlt" maxlength="200" placeholder="Örn: Online eğitim ile başarıya giden yol" />
+    </div>
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+    <a asp-action="Index" class="btn btn-ghost">İptal</a>
+  </form>
+</div>
+@section Scripts {
+  <script>
+  (function() {
+    var uploadUrl = '@Url.Action("Image", "Upload", new { area = "" })';
+    var tokenEl = document.querySelector('input[name="__RequestVerificationToken"]');
+    var token = tokenEl ? tokenEl.value : '';
+    var btn = document.getElementById('slide-upload-btn');
+    var input = document.getElementById('slide-upload');
+    var preview = document.getElementById('slide-preview');
+    var placeholder = document.getElementById('slide-placeholder');
+    var urlInput = document.getElementById('ImageUrl');
+    if (btn && input) {
+      btn.addEventListener('click', function() { input.click(); });
+      input.addEventListener('change', function() {
+        var file = input.files && input.files[0];
+        if (!file) return;
+        var data = new FormData();
+        data.append('upload', file);
+        if (token) data.append('__RequestVerificationToken', token);
+        btn.disabled = true;
+        fetch(uploadUrl, { method: 'POST', body: data, credentials: 'same-origin' })
+          .then(function(r) { return r.json(); })
+          .then(function(res) {
+            if (res.error) throw new Error(res.error.message);
+            if (urlInput) urlInput.value = res.url;
+            if (preview) { preview.src = res.url; preview.style.display = 'block'; }
+            if (placeholder) placeholder.style.display = 'none';
+          })
+          .catch(function(err) { alert(err.message || 'Yükleme hatası'); })
+          .finally(function() { btn.disabled = false; input.value = ''; });
+      });
+    }
+  })();
+  </script>
+}

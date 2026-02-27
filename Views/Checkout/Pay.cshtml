@@ -1,0 +1,22 @@
+@{
+  ViewData["Title"] = "Ödeme";
+  var token = ViewBag.PayTRToken as string;
+  var orderId = ViewBag.OrderId;
+  var total = ViewBag.Total as decimal? ?? 0;
+}
+<section class="section">
+  <div class="container">
+    <h1 style="margin-bottom: 24px;">Ödeme</h1>
+    <p style="margin-bottom: 24px;">Toplam: ₺@total.ToString("N0") — Aşağıdaki formu kullanarak ödemenizi tamamlayın.</p>
+    @if (!string.IsNullOrEmpty(token))
+    {
+      <iframe src="https://www.paytr.com/odeme/guvenli/@token" id="paytriframe" frameborder="0" scrolling="no" style="width: 100%; height: 600px;"></iframe>
+      <p style="margin-top: 16px; color: var(--text-muted);">Ödeme tamamlandığında otomatik yönlendirileceksiniz.</p>
+    }
+    else
+    {
+      <p>Ödeme sistemi şu an yapılandırılmamış. Admin panelinden PayTR ayarlarını girin.</p>
+      <a asp-controller="Dashboard" asp-action="Index" class="btn btn-primary">Hesabıma Dön</a>
+    }
+  </div>
+</section>

@@ -1,0 +1,108 @@
+@{
+  ViewData["Title"] = "Site Sabit Yazılar";
+  var texts = ViewBag.Texts as IReadOnlyDictionary<string, string?> ?? new Dictionary<string, string?>();
+  string Val(string key) => texts.TryGetValue(key, out var v) && !string.IsNullOrEmpty(v) ? v! : HizliOgren.Services.SiteTextKeys.GetDefault(key);
+}
+<div class="card" style="padding: 24px; max-width: 800px;">
+  <h2 style="font-size: 1.2rem; margin-bottom: 8px;">Site Sabit Yazılar</h2>
+  <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 0.9rem;">Ana sayfa, footer ve Hakkımızda sayfasındaki slogan ve metinleri buradan düzenleyin. Boş bırakılan alanlar varsayılan metinle gösterilir.</p>
+
+  <form method="post">
+    @Html.AntiForgeryToken()
+    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">Ana sayfa slaytlarını <a asp-area="Admin" asp-controller="HeroSlides" asp-action="Index">Slaytlar</a> sayfasından düzenleyin.</p>
+
+    <h3 style="font-size: 1rem; margin: 24px 0 12px; color: var(--text);">Özellik kartları (Ana sayfa)</h3>
+    <div class="form-group">
+      <label>Özellik 1 başlık</label>
+      <input type="text" name="Feature1Title" class="form-control" value="@Val("Feature1Title")" />
+    </div>
+    <div class="form-group">
+      <label>Özellik 1 metin</label>
+      <input type="text" name="Feature1Text" class="form-control" value="@Val("Feature1Text")" />
+    </div>
+    <div class="form-group">
+      <label>Özellik 2 başlık</label>
+      <input type="text" name="Feature2Title" class="form-control" value="@Val("Feature2Title")" />
+    </div>
+    <div class="form-group">
+      <label>Özellik 2 metin</label>
+      <input type="text" name="Feature2Text" class="form-control" value="@Val("Feature2Text")" />
+    </div>
+    <div class="form-group">
+      <label>Özellik 3 başlık</label>
+      <input type="text" name="Feature3Title" class="form-control" value="@Val("Feature3Title")" />
+    </div>
+    <div class="form-group">
+      <label>Özellik 3 metin</label>
+      <input type="text" name="Feature3Text" class="form-control" value="@Val("Feature3Text")" />
+    </div>
+
+    <h3 style="font-size: 1rem; margin: 24px 0 12px; color: var(--text);">Bölüm başlıkları (Ana sayfa)</h3>
+    <div class="form-group">
+      <label>Eğitimler bölümü başlık</label>
+      <input type="text" name="SectionEgitimlerTitle" class="form-control" value="@Val("SectionEgitimlerTitle")" />
+    </div>
+    <div class="form-group">
+      <label>Eğitimler bölümü alt başlık</label>
+      <input type="text" name="SectionEgitimlerSubtitle" class="form-control" value="@Val("SectionEgitimlerSubtitle")" />
+    </div>
+    <div class="form-group">
+      <label>CTA bölümü başlık (mor kutu)</label>
+      <input type="text" name="SectionCtaTitle" class="form-control" value="@Val("SectionCtaTitle")" />
+    </div>
+    <div class="form-group">
+      <label>CTA bölümü metin</label>
+      <textarea name="SectionCtaText" class="form-control" rows="2">@Val("SectionCtaText")</textarea>
+    </div>
+    <div class="form-group">
+      <label>Blog bölümü başlık</label>
+      <input type="text" name="SectionBlogTitle" class="form-control" value="@Val("SectionBlogTitle")" />
+    </div>
+    <div class="form-group">
+      <label>Blog bölümü alt başlık</label>
+      <input type="text" name="SectionBlogSubtitle" class="form-control" value="@Val("SectionBlogSubtitle")" />
+    </div>
+    <div class="form-group">
+      <label>Hakkımızda bölümü başlık (ana sayfa)</label>
+      <input type="text" name="SectionHakkimizdaTitle" class="form-control" value="@Val("SectionHakkimizdaTitle")" />
+    </div>
+    <div class="form-group">
+      <label>Hakkımızda bölümü alt başlık</label>
+      <textarea name="SectionHakkimizdaSubtitle" class="form-control" rows="2">@Val("SectionHakkimizdaSubtitle")</textarea>
+    </div>
+    <div class="form-group">
+      <label>Hakkımızda bölümü buton metni</label>
+      <input type="text" name="SectionHakkimizdaButton" class="form-control" value="@Val("SectionHakkimizdaButton")" />
+    </div>
+
+    <h3 style="font-size: 1rem; margin: 24px 0 12px; color: var(--text);">Footer</h3>
+    <div class="form-group">
+      <label>Footer slogan (logo altı)</label>
+      <textarea name="FooterTagline" class="form-control" rows="2">@Val("FooterTagline")</textarea>
+    </div>
+    <div class="form-group">
+      <label>Footer telif metni ({0} = yıl)</label>
+      <input type="text" name="FooterCopyright" class="form-control" value="@Val("FooterCopyright")" placeholder="© {0} Hızlı Öğren..." />
+    </div>
+
+    <h3 style="font-size: 1rem; margin: 24px 0 12px; color: var(--text);">SEO & Hakkımızda sayfası</h3>
+    <div class="form-group">
+      <label>Varsayılan meta açıklama</label>
+      <textarea name="MetaDescriptionDefault" class="form-control" rows="2">@Val("MetaDescriptionDefault")</textarea>
+    </div>
+    <div class="form-group">
+      <label>Hakkımızda sayfası – başlık altı metin</label>
+      <textarea name="HakkimizdaBreadcrumbSubtitle" class="form-control" rows="2">@Val("HakkimizdaBreadcrumbSubtitle")</textarea>
+    </div>
+    <div class="form-group">
+      <label>Hakkımızda sayfası – kutu başlığı (Hemen Başlayın)</label>
+      <input type="text" name="HakkimizdaBoxTitle" class="form-control" value="@Val("HakkimizdaBoxTitle")" />
+    </div>
+    <div class="form-group">
+      <label>Hakkımızda sayfası – kutu metni</label>
+      <textarea name="HakkimizdaBoxText" class="form-control" rows="2">@Val("HakkimizdaBoxText")</textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary" style="margin-top: 16px;">Tümünü Kaydet</button>
+  </form>
+</div>

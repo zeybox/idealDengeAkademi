@@ -1,0 +1,77 @@
+@model List<HizliOgren.Models.HeroSlide>
+@{
+  ViewData["Title"] = "Hero Slaytları";
+}
+<div class="card" style="padding: 24px; max-width: 900px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+    <h2 style="font-size: 1.2rem; margin: 0;">Ana sayfa hero slaytları</h2>
+    <a asp-action="Create" class="btn btn-primary">+ Yeni slayt</a>
+  </div>
+  <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">Slaytların sırasını yukarı/aşağı ile değiştirebilir, resim ve metinleri düzenleyebilirsiniz.</p>
+  @if (Model != null && Model.Any())
+  {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 80px;">Sıra</th>
+            <th style="width: 120px;">Görsel</th>
+            <th>Başlık</th>
+            <th style="width: 200px;">İşlem</th>
+          </tr>
+        </thead>
+        <tbody>
+          @{ var slides = Model; var count = slides.Count; }
+          @for (var i = 0; i < count; i++)
+          {
+            var s = slides[i];
+            <tr>
+              <td>@s.SortOrder</td>
+              <td>
+                @if (!string.IsNullOrEmpty(s.ImageUrl))
+                {
+                  <img src="@s.ImageUrl" alt="" style="width: 100px; height: 56px; object-fit: cover; border-radius: 4px;" />
+                }
+                else
+                {
+                  <span style="font-size: 0.85rem; color: var(--text-muted);">—</span>
+                }
+              </td>
+              <td>
+                <strong>@s.Title</strong>
+                @if (!string.IsNullOrEmpty(s.Text))
+                {
+                  <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@s.Text</div>
+                }
+              </td>
+              <td>
+                <form asp-action="Move" method="post" style="display:inline;">
+                  @Html.AntiForgeryToken()
+                  <input type="hidden" name="id" value="@s.Id" />
+                  <input type="hidden" name="direction" value="up" />
+                  <button type="submit" class="btn btn-ghost" style="padding: 4px 8px; font-size: 0.85rem;" @(i == 0 ? "disabled" : "") title="Yukarı">↑</button>
+                </form>
+                <form asp-action="Move" method="post" style="display:inline;">
+                  @Html.AntiForgeryToken()
+                  <input type="hidden" name="id" value="@s.Id" />
+                  <input type="hidden" name="direction" value="down" />
+                  <button type="submit" class="btn btn-ghost" style="padding: 4px 8px; font-size: 0.85rem;" @(i == count - 1 ? "disabled" : "") title="Aşağı">↓</button>
+                </form>
+                <a asp-action="Edit" asp-route-id="@s.Id" class="btn btn-ghost" style="padding: 6px 12px; font-size: 0.85rem;">Düzenle</a>
+                <form asp-action="Delete" method="post" style="display:inline;" onsubmit="return confirm('Bu slaytı silmek istediğinize emin misiniz?');">
+                  @Html.AntiForgeryToken()
+                  <input type="hidden" name="id" value="@s.Id" />
+                  <button type="submit" class="btn btn-ghost" style="padding: 6px 12px; font-size: 0.85rem;">Kaldır</button>
+                </form>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+  else
+  {
+    <p style="color: var(--text-muted);">Henüz slayt yok. <a asp-action="Create">İlk slaytı ekleyin</a>.</p>
+  }
+</div>

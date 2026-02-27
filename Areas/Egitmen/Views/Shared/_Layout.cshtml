@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>@(ViewData["Title"] != null ? ViewData["Title"] + " | Eğitmen | " : "Eğitmen | ")Hızlı Öğren</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="~/images/Logo.png" />
+  <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
+</head>
+<body>
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <a asp-area="" asp-controller="Home" asp-action="Index" class="logo"><img src="~/images/Logo.png" alt="Hızlı Öğren"></a>
+      <nav class="admin-nav">
+        <a asp-area="Egitmen" asp-controller="Home" asp-action="Index">Panel</a>
+        <a asp-area="Egitmen" asp-controller="Courses" asp-action="Index">Eğitimlerim</a>
+        <a asp-area="Egitmen" asp-controller="Sales" asp-action="Index">Satışlarım</a>
+        <a asp-area="Egitmen" asp-controller="Profile" asp-action="Index">Profilim</a>
+        <a asp-area="" asp-controller="Home" asp-action="Index" style="margin-top: 24px; border-top: 1px solid #334155; padding-top: 24px;">Siteye Dön</a>
+      </nav>
+    </aside>
+    <main class="admin-main">
+      <div class="admin-header">
+        <h1>@ViewData["Title"]</h1>
+        <a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-ghost">Siteye Git</a>
+      </div>
+      @if (TempData["Toast"] != null)
+      {
+        <div class="alert alert-success" style="margin-bottom: 24px;">@TempData["Toast"]</div>
+      }
+      @RenderBody()
+    </main>
+  </div>
+  <script src="~/js/main.js" asp-append-version="true"></script>
+  @await RenderSectionAsync("Scripts", required: false)
+  @await Html.PartialAsync("_ConfirmModal")
+</body>
+</html>

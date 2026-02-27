@@ -1,0 +1,41 @@
+@model List<HizliOgren.Models.OrderItem>
+@{
+  ViewData["Title"] = "Satışlarım";
+  var total = ViewBag.Total as decimal? ?? Model.Where(oi => oi.Order?.Status == "Paid").Sum(oi => oi.Price);
+}
+<div class="stat-cards" style="margin-bottom: 24px;">
+  <div class="stat-card">
+    <h4>Toplam Gelir (Ödenen)</h4>
+    <div class="value">@total.ToString("N0") TL</div>
+  </div>
+  <div class="stat-card">
+    <h4>Satış Adedi</h4>
+    <div class="value">@Model.Count(oi => oi.Order?.Status == "Paid")</div>
+  </div>
+</div>
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Tarih</th>
+        <th>Eğitim</th>
+        <th>Alıcı</th>
+        <th>Tutar</th>
+        <th>Durum</th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach (var oi in Model)
+      {
+        <tr>
+          <td>@(oi.Order?.CreatedAt.ToString("d MMM yyyy HH:mm"))</td>
+          <td>@(oi.Course?.Title)</td>
+          <td>@(oi.Order?.User?.Email)</td>
+          <td>@(oi.Price.ToString("N0")) TL</td>
+          <td><span class="badge @(oi.Order?.Status == "Paid" ? "badge-success" : "badge-warning")">@(oi.Order?.Status == "Paid" ? "Ödendi" : oi.Order?.Status == "Pending" ? "Beklemede" : oi.Order?.Status == "Failed" ? "Başarısız" : oi.Order?.Status == "Refunded" ? "İade Edildi" : oi.Order?.Status ?? "")</span></td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+@if (Model.Count == 0) { <p style="color: var(--text-muted);">Henüz satış yok.</p> }

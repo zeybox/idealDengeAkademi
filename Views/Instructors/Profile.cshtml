@@ -1,0 +1,81 @@
+@model HizliOgren.Models.User
+@{
+  ViewData["Title"] = Model.FullName + " - Eğitmen";
+  var courses = ViewBag.Courses as List<HizliOgren.Models.Course> ?? new List<HizliOgren.Models.Course>();
+}
+<section class="section">
+  <div class="container" style="max-width: 900px;">
+    <nav class="breadcrumb">
+      <a asp-controller="Home" asp-action="Index">Ana Sayfa</a>
+      <span>/</span>
+      <a asp-controller="Courses" asp-action="Index">Eğitimler</a>
+      <span>/</span>
+      <span>Eğitmen</span>
+    </nav>
+
+    <div class="card" style="padding: 32px; margin-bottom: 32px;">
+      <div style="display: flex; align-items: flex-start; gap: 24px; flex-wrap: wrap;">
+        <div style="flex-shrink: 0;">
+          @if (!string.IsNullOrWhiteSpace(Model.AvatarUrl))
+          {
+            <img src="@Model.AvatarUrl" alt="@Model.FullName" style="width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 3px solid var(--border);" />
+          }
+          else
+          {
+            <div style="width: 120px; height: 120px; background: var(--bg-soft); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem;">👩‍🏫</div>
+          }
+        </div>
+        <div style="flex: 1; min-width: 0;">
+          <h1 style="margin: 0 0 4px 0; font-size: 1.75rem;">@Model.FullName</h1>
+          @if (!string.IsNullOrWhiteSpace(Model.Title))
+          {
+            <p style="color: var(--primary); font-weight: 600; font-size: 1rem; margin: 0 0 12px 0;">@Model.Title</p>
+          }
+          @if (!string.IsNullOrWhiteSpace(Model.Bio))
+          {
+            <div style="color: var(--text-muted); line-height: 1.7; white-space: pre-wrap;">@Model.Bio</div>
+          }
+          else
+          {
+            <p style="color: var(--text-muted);">Bu eğitmen henüz bir tanıtım yazısı eklemedi.</p>
+          }
+        </div>
+      </div>
+    </div>
+
+    <h2 style="font-size: 1.25rem; margin-bottom: 16px;">Eğitimler</h2>
+    @if (courses.Count > 0)
+    {
+      <div class="course-grid">
+        @foreach (var c in courses)
+        {
+          <article class="card">
+            <a asp-controller="Courses" asp-action="Detail" asp-route-id="@c.Id" style="text-decoration: none; color: inherit;">
+              <img src="@(c.ImageUrl ?? "https://placehold.co/400x250/e0f2f1/0f766e?text=" + Uri.EscapeDataString(c.Title))" alt="@c.Title" class="card-img" />
+              <div class="card-body">
+                <h3 class="card-title">@c.Title</h3>
+                <div class="card-meta">
+                  <span>@c.Category?.Name</span>
+                  @{ var totalMin = (c.CurriculumItems ?? new List<HizliOgren.Models.CurriculumItem>()).Where(x => x.Type == "video").Sum(x => x.DurationMinutes ?? 0); }
+                  <span>@(totalMin > 0 ? "⏱ " + totalMin + " dk" : "")</span>
+                </div>
+              </div>
+              <div class="card-footer">
+                <span class="card-price">₺@c.Price.ToString("N0")</span>
+                <span class="btn btn-primary">İncele</span>
+              </div>
+            </a>
+          </article>
+        }
+      </div>
+    }
+    else
+    {
+      <p style="color: var(--text-muted);">Bu eğitmene ait yayında eğitim bulunmuyor.</p>
+    }
+
+    <p style="margin-top: 32px;">
+      <a asp-controller="Courses" asp-action="Index" class="btn btn-ghost">← Tüm Eğitimlere Dön</a>
+    </p>
+  </div>
+</section>

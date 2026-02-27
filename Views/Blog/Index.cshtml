@@ -1,0 +1,51 @@
+@model List<HizliOgren.Models.BlogPost>
+@{
+  ViewData["Title"] = "Blog";
+  var q = ViewBag.Q as string;
+}
+<section class="page-header">
+  <div class="container">
+    <nav class="breadcrumb">
+      <a asp-controller="Home" asp-action="Index">Ana Sayfa</a>
+      <span>/</span>
+      <span>Blog</span>
+    </nav>
+    <h1>Blog</h1>
+    <p>İpuçları, makaleler ve güncel yazılar. Herkese açık.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <form method="get" asp-action="Index" style="margin-bottom: 32px;">
+      <input type="search" name="q" class="form-control" placeholder="Yazı ara..." value="@q" style="max-width: 400px;" />
+      <button type="submit" class="btn btn-primary" style="margin-top: 8px;">Ara</button>
+    </form>
+
+    <div class="blog-grid">
+      @foreach (var post in Model)
+      {
+        <article class="card blog-card">
+          <img src="@(post.ImageUrl ?? "https://placehold.co/400x225/e0f2f1/0f766e?text=Blog")" alt="@post.Title" class="card-img" />
+          <div class="card-body">
+            <div class="card-meta">
+              @if (post.PublishedAt.HasValue) { <span>@post.PublishedAt.Value.ToString("d MMM yyyy")</span> }
+              @if (post.Author != null) { <span>@post.Author.FullName</span> }
+            </div>
+            <h3 class="card-title"><a asp-action="Post" asp-route-slug="@post.Slug">@post.Title</a></h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">@(post.Excerpt ?? "")</p>
+          </div>
+          <div class="card-footer">
+            <a asp-action="Post" asp-route-slug="@post.Slug" class="btn btn-ghost">Oku</a>
+          </div>
+        </article>
+      }
+    </div>
+    @if (Model.Count == 0)
+    {
+      <div class="empty-state">
+        <p>Aradığınız kriterlere uygun yazı bulunamadı.</p>
+      </div>
+    }
+  </div>
+</section>

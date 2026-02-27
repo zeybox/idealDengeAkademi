@@ -1,0 +1,65 @@
+@model HizliOgren.Models.InstructorApplicationViewModel
+@{
+  ViewData["Title"] = "Eğitmen Ol";
+}
+<section class="section">
+  <div class="container" style="max-width: 640px;">
+    @if (TempData["EgitmenBasvuruSuccess"] as bool? == true)
+    {
+      <div class="alert alert-success" style="margin-bottom: 24px;">
+        Başvurunuz alındı. En kısa sürede değerlendirilip e-posta ile bilgilendirileceksiniz.
+      </div>
+    }
+    <div class="card" style="padding: 32px;">
+      <h1 style="font-size: 1.75rem; margin-bottom: 8px;">Eğitmen Ol</h1>
+      <p class="form-intro">Platformumuzda eğitim vermek istiyorsanız aşağıdaki formu doldurun. Başvurunuz incelendikten sonra size dönüş yapacağız.</p>
+      <form asp-action="Index" method="post">
+        <div asp-validation-summary="All" class="text-danger" style="margin-bottom: 16px;"></div>
+        @Html.AntiForgeryToken()
+        <div class="form-group">
+          <label asp-for="FullName">Ad Soyad</label>
+          <input asp-for="FullName" class="form-control" placeholder="Adınız Soyadınız" />
+          <span asp-validation-for="FullName" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+          <label asp-for="Email">E-posta</label>
+          <input asp-for="Email" type="email" class="form-control" placeholder="ornek@email.com" />
+          <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+          <label asp-for="Phone">Telefon (Opsiyonel)</label>
+          <input asp-for="Phone" class="form-control" placeholder="5xx xxx xx xx" />
+        </div>
+        <div class="form-group">
+          <label asp-for="City">Şehir (Opsiyonel)</label>
+          <select asp-for="City" class="form-control" asp-items="ViewBag.CityList"></select>
+        </div>
+        <div class="form-group">
+          <label asp-for="Message">Deneyim / Neden eğitmen olmak istiyorsunuz? (Opsiyonel)</label>
+          <textarea asp-for="Message" class="form-control" rows="4" placeholder="Kısa deneyiminizi veya hangi konularda eğitim vermek istediğinizi yazabilirsiniz."></textarea>
+        </div>
+        <div class="form-group">
+          <label asp-for="CaptchaCode">Güvenlik kodu</label>
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; max-width: 100%;">
+            <img id="captcha-img-basvuru" src="@Url.Action("Image", "Captcha", new { key = "Basvuru", t = DateTime.UtcNow.Ticks })" alt="Güvenlik kodu" style="height: 28px; width: auto; border: 1px solid var(--border); border-radius: var(--radius-sm); background: #f5f5fa; display: block;" />
+            <a href="#" id="captcha-refresh-basvuru" title="Yenile" style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-muted);" aria-label="Kodu yenile"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg></a>
+            <input asp-for="CaptchaCode" class="form-control" placeholder="Giriniz" maxlength="10" autocomplete="off" style="max-width: 90px; min-width: 0;" />
+          </div>
+          <span asp-validation-for="CaptchaCode" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary">Başvuruyu Gönder</button>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-ghost">İptal</a>
+      </form>
+    </div>
+  </div>
+</section>
+@section Scripts {
+  <partial name="_ValidationScriptsPartial" />
+  <script>
+    (function() {
+      var img = document.getElementById('captcha-img-basvuru');
+      var refresh = document.getElementById('captcha-refresh-basvuru');
+      if (refresh) refresh.addEventListener('click', function(e) { e.preventDefault(); if (img) img.src = '@Url.Action("Image", "Captcha", new { key = "Basvuru" })&_' + Date.now(); });
+    })();
+  </script>
+}

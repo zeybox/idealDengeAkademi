@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>@(ViewData["Title"] != null ? ViewData["Title"] + " | " : "")@(ViewData["SiteName"] ?? "Hızlı Öğren") - www.hizliogren.net.tr</title>
+  <meta name="description" content="@(ViewData["MetaDescription"] ?? ViewData["MetaDescriptionDefault"] ?? "Hızlı Öğren ile online eğitimlere katılın. Video, PDF ve makalelerle kişisel ve mesleki gelişim.")" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="~/images/Logo.png" />
+  <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <nav class="nav">
+        <a asp-controller="Home" asp-action="Index" class="logo"><img src="~/images/Logo.png" alt="@(ViewData["SiteName"] ?? "Hızlı Öğren")"></a>
+        <ul class="nav-links">
+          <li><a asp-controller="Home" asp-action="Index">Ana Sayfa</a></li>
+          <li class="dropdown">
+            <button class="dropdown-toggle" type="button">Kategoriler ▾</button>
+            @await Component.InvokeAsync("CategoryMenu")
+          </li>
+          <li><a asp-controller="Courses" asp-action="Index">Eğitimler</a></li>
+          <li><a asp-controller="Blog" asp-action="Index">Blog</a></li>
+        </ul>
+        <div class="nav-actions">
+          <a asp-controller="Checkout" asp-action="Index" class="btn btn-ghost">🛒 Sepet @await Component.InvokeAsync("CartCount")</a>
+          @if (User.Identity?.IsAuthenticated == true)
+          {
+            @if (User.IsInRole("Admin"))
+            {
+              <a href="~/Admin" class="btn btn-ghost">Admin</a>
+            }
+            else if (User.IsInRole("Egitmen"))
+            {
+              <a href="~/Egitmen" class="btn btn-ghost">Eğitmen Paneli</a>
+            }
+            else
+            {
+              <a asp-controller="Dashboard" asp-action="Index" class="btn btn-ghost">Hesabım</a>
+            }
+            <form asp-controller="Auth" asp-action="Logout" method="post" style="display:inline;">
+              @Html.AntiForgeryToken()
+              <button type="submit" class="btn btn-ghost">Çıkış</button>
+            </form>
+          }
+          else
+          {
+            <a asp-controller="Auth" asp-action="Login" class="btn btn-ghost">Giriş</a>
+            <a asp-controller="Auth" asp-action="Register" class="btn btn-primary">Kayıt Ol</a>
+          }
+        </div>
+        <button class="menu-toggle" type="button" aria-label="Menü">☰</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    @RenderBody()
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a asp-controller="Home" asp-action="Index" class="logo"><img src="~/images/Logo.png" alt="@(ViewData["SiteName"] ?? "Hızlı Öğren")"></a>
+          <p>@(ViewData["FooterTagline"] ?? "Öğrenmek hiç bu kadar hızlı olmamıştı. Hemen başlayın — ilk eğitiminiz bir tık uzağınızda.")</p>
+        </div>
+        <div>
+          <h4>Sayfalar</h4>
+          <ul>
+            <li><a asp-controller="Home" asp-action="Index">Ana Sayfa</a></li>
+            <li><a asp-controller="Courses" asp-action="Index">Eğitimler</a></li>
+            <li><a asp-controller="Blog" asp-action="Index">Blog</a></li>
+            <li><a asp-controller="Auth" asp-action="Register">Kayıt Ol</a></li>
+            <li><a asp-controller="Auth" asp-action="Login">Giriş</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Kurumsal</h4>
+          <ul>
+            <li><a asp-controller="Home" asp-action="Hakkimizda">Hakkımızda</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Eğitmen & Yönetim</h4>
+          <ul>
+            <li><a asp-controller="EgitmenBasvuru" asp-action="Index">Eğitmen Ol — Başvuru</a></li>
+            <li><a href="~/Egitmen">Eğitim Ver / Eğitmen Paneli</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>@(string.Format(ViewData["FooterCopyright"] as string ?? "© {0} Hızlı Öğren (www.hizliogren.net.tr). Tüm hakları saklıdır.", DateTime.UtcNow.Year))</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="~/js/main.js" asp-append-version="true"></script>
+  @await RenderSectionAsync("Scripts", required: false)
+  @await Html.PartialAsync("_ConfirmModal")
+</body>
+</html>

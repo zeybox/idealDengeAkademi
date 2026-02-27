@@ -1,0 +1,93 @@
+@model HizliOgren.Models.User
+@{
+  ViewData["Title"] = "Üye Düzenle: " + Model.FullName;
+}
+<div class="card" style="padding: 24px; max-width: 720px;">
+  <h2>Üye Bilgilerini Düzenle</h2>
+  <form asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <div class="form-row" style="display: flex; gap: 24px; flex-wrap: wrap;">
+      <div style="flex: 1; min-width: 200px;">
+        <div class="form-group">
+          <label asp-for="FullName">Ad Soyad</label>
+          <input asp-for="FullName" class="form-control" required maxlength="200" />
+          <span asp-validation-for="FullName" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+          <label asp-for="Email">E-posta</label>
+          <input asp-for="Email" type="email" class="form-control" required maxlength="256" />
+          <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+          <label asp-for="Role">Rol</label>
+          <select asp-for="Role" class="form-control" asp-items="ViewBag.Roles"></select>
+        </div>
+        <div class="form-group">
+          <label asp-for="City">Şehir</label>
+          <select asp-for="City" class="form-control" asp-items="ViewBag.CityList"></select>
+        </div>
+        <div class="form-group">
+          <label asp-for="Title">Unvan (eğitmen için)</label>
+          <input asp-for="Title" class="form-control" maxlength="150" placeholder="Örn. Yazılım Eğitmeni" />
+        </div>
+        <div class="form-group">
+          <label asp-for="Phone">Telefon</label>
+          <input asp-for="Phone" class="form-control" maxlength="50" />
+        </div>
+      </div>
+      <div class="form-group" style="min-width: 160px;">
+        <label asp-for="AvatarUrl">Profil fotoğrafı</label>
+        <input type="hidden" asp-for="AvatarUrl" id="AvatarUrl" />
+        <div style="border: 1px dashed var(--border); border-radius: var(--radius-sm); padding: 12px; background: var(--bg-soft); text-align: center;">
+          <img id="avatar-preview" src="@(Model.AvatarUrl ?? "")" alt="Profil" style="width: 120px; height: 120px; object-fit: cover; border-radius: 50%; display: @(string.IsNullOrEmpty(Model.AvatarUrl) ? "none" : "block"); margin: 0 auto 8px;" />
+          <span id="avatar-placeholder" style="font-size: 0.85rem; color: var(--text-muted); display: @(string.IsNullOrEmpty(Model.AvatarUrl) ? "block" : "none");">Fotoğraf yok</span>
+          <button type="button" id="avatar-upload-btn" class="btn btn-ghost" style="margin-top: 8px; font-size: 0.9rem;">📷 Yükle</button>
+          <input type="file" id="avatar-upload" accept=".jpg,.jpeg,.png,.gif,.webp" style="display: none;" />
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label asp-for="Bio">Biyografi / Hakkında</label>
+      <textarea asp-for="Bio" class="form-control" rows="4" maxlength="2000"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+    <a asp-action="Index" class="btn btn-ghost">İptal</a>
+  </form>
+</div>
+@section Scripts {
+  <partial name="_ValidationScriptsPartial" />
+  <script>
+    (function() {
+      var uploadUrl = '@Url.Action("Image", "Upload", new { area = "" })';
+      var tokenEl = document.querySelector('input[name="__RequestVerificationToken"]');
+      var token = tokenEl ? tokenEl.value : '';
+      var btn = document.getElementById('avatar-upload-btn');
+      var input = document.getElementById('avatar-upload');
+      var preview = document.getElementById('avatar-preview');
+      var placeholder = document.getElementById('avatar-placeholder');
+      var urlInput = document.getElementById('AvatarUrl');
+      if (btn && input) {
+        btn.addEventListener('click', function() { input.click(); });
+        input.addEventListener('change', function() {
+          var file = input.files && input.files[0];
+          if (!file) return;
+          var data = new FormData();
+          data.append('upload', file);
+          if (token) data.append('__RequestVerificationToken', token);
+          btn.disabled = true;
+          fetch(uploadUrl, { method: 'POST', body: data, credentials: 'same-origin' })
+            .then(function(r) { return r.json(); })
+            .then(function(res) {
+              if (res.error) throw new Error(res.error.message);
+              if (urlInput) urlInput.value = res.url;
+              if (preview) { preview.src = res.url; preview.style.display = 'block'; }
+              if (placeholder) placeholder.style.display = 'none';
+            })
+            .catch(function(err) { alert(err.message || 'Yükleme hatası'); })
+            .finally(function() { btn.disabled = false; input.value = ''; });
+        });
+      }
+    })();
+  </script>
+}

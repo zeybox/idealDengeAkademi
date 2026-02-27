@@ -1,0 +1,74 @@
+@model List<HizliOgren.Models.Course>
+@{
+  ViewData["Title"] = "Eğitimler";
+  var categories = ViewBag.Categories as List<HizliOgren.Models.Category> ?? new List<HizliOgren.Models.Category>();
+  var currentCat = ViewBag.CurrentCat as string;
+  var q = ViewBag.Q as string;
+}
+<section class="page-header">
+  <div class="container">
+    <nav class="breadcrumb">
+      <a asp-controller="Home" asp-action="Index">Ana Sayfa</a>
+      <span>/</span>
+      <span>Eğitimler</span>
+    </nav>
+    <h1>Tüm Eğitimler</h1>
+    <p>Video eğitimler, PDF kaynaklar ve makalelerle zenginleştirilmiş içerikler. Kategori veya arama ile filtreleyin.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="category-list">
+      <a asp-action="Index" asp-route-cat="" class="category-pill @(string.IsNullOrEmpty(currentCat) ? "active" : "")">Tümü</a>
+      @foreach (var c in categories)
+      {
+        <a asp-action="Index" asp-route-cat="@c.Slug" class="category-pill @(currentCat == c.Slug ? "active" : "")">@c.Name</a>
+      }
+    </div>
+
+    <form method="get" asp-action="Index" style="display: flex; gap: 16px; margin-bottom: 32px; flex-wrap: wrap;">
+      <input type="hidden" name="cat" value="@currentCat" />
+      <input type="search" name="q" class="form-control" placeholder="Eğitim ara..." value="@q" style="max-width: 320px;" />
+      <button type="submit" class="btn btn-primary">Ara</button>
+    </form>
+
+    <div class="course-grid">
+      @foreach (var course in Model)
+      {
+        <article class="card">
+          <img src="@(course.ImageUrl ?? "https://placehold.co/400x250/e0f2f1/0f766e?text=" + Uri.EscapeDataString(course.Title))" alt="@course.Title" class="card-img" />
+          <div class="card-body">
+            <h3 class="card-title">@course.Title</h3>
+            <div class="card-meta">
+              <span>@course.Category?.Name</span>
+              @{ var totalMin = (course.CurriculumItems ?? new List<HizliOgren.Models.CurriculumItem>()).Where(x => x.Type == "video").Sum(x => x.DurationMinutes ?? 0); }
+              <span>@(totalMin > 0 ? "⏱ " + totalMin + " dk" : "⏱ Eğitim")</span>
+            </div>
+            @if (course.Instructor != null)
+            {
+              <a asp-controller="Instructors" asp-action="Profile" asp-route-id="@course.Instructor.Id" class="card-instructor" style="display: flex; align-items: center; gap: 8px; margin-top: 10px; color: var(--text-muted); font-size: 0.9rem; text-decoration: none;">
+                @if (!string.IsNullOrWhiteSpace(course.Instructor.AvatarUrl))
+                { <img src="@course.Instructor.AvatarUrl" alt="" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover;" /> }
+                else
+                { <span style="width: 24px; height: 24px; background: var(--bg-soft); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem;">👤</span> }
+                <span>@course.Instructor.FullName</span>
+              </a>
+            }
+          </div>
+          <div class="card-footer">
+            <span class="card-price">₺@course.Price.ToString("N0") </span>
+            <a asp-action="Detail" asp-route-id="@course.Id" class="btn btn-primary">İncele</a>
+          </div>
+        </article>
+      }
+    </div>
+    @if (Model.Count == 0)
+    {
+      <div class="empty-state">
+        <p>Bu kriterlere uygun eğitim bulunamadı.</p>
+        <a asp-action="Index" class="btn btn-primary">Tümünü Göster</a>
+      </div>
+    }
+  </div>
+</section>

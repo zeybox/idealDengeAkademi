@@ -1,0 +1,31 @@
+@model HizliOgren.Models.BlogPost
+@{
+  ViewData["Title"] = Model.Title;
+  ViewData["MetaDescription"] = Model.Excerpt ?? Model.Title;
+}
+<section class="section">
+  <div class="container" style="max-width: 720px;">
+    <nav class="breadcrumb">
+      <a asp-controller="Home" asp-action="Index">Ana Sayfa</a>
+      <span>/</span>
+      <a asp-controller="Blog" asp-action="Index">Blog</a>
+      <span>/</span>
+      <span>@Model.Title</span>
+    </nav>
+    <article>
+      <h1 style="font-size: 2rem; margin-bottom: 16px;">@Model.Title</h1>
+      <div class="card-meta" style="margin-bottom: 24px;">
+        @if (Model.PublishedAt.HasValue) { <span>@Model.PublishedAt.Value.ToString("d MMMM yyyy")</span> }
+        @if (Model.Author != null) { <span>@Model.Author.FullName</span> }
+      </div>
+      @if (!string.IsNullOrEmpty(Model.ImageUrl))
+      {
+        <img src="@Model.ImageUrl" alt="@Model.Title" style="width:100%;border-radius:var(--radius);margin-bottom:24px;" />
+      }
+      <div style="line-height: 1.8;">
+        @Html.Raw(Model.Content ?? Model.Excerpt ?? "")
+      </div>
+    </article>
+    <p style="margin-top: 32px;"><a asp-controller="Blog" asp-action="Index" class="btn btn-ghost">← Bloga Dön</a></p>
+  </div>
+</section>

@@ -1,0 +1,43 @@
+@model List<HizliOgren.Models.Order>
+@{
+  ViewData["Title"] = "Siparişler";
+  var status = ViewBag.Status as string;
+}
+<form method="get" asp-action="Index" style="margin-bottom: 24px;">
+  <select name="status" class="form-control" style="max-width: 200px; display: inline-block;">
+    <option value="">Tüm Durumlar</option>
+    <option value="Pending" selected="@(status == "Pending")">Beklemede</option>
+    <option value="Paid" selected="@(status == "Paid")">Ödendi</option>
+    <option value="Failed" selected="@(status == "Failed")">Başarısız</option>
+  </select>
+  <button type="submit" class="btn btn-ghost">Filtrele</button>
+</form>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Sipariş No</th>
+        <th>Kullanıcı</th>
+        <th>Ürünler</th>
+        <th>Tutar</th>
+        <th>Durum</th>
+        <th>Tarih</th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach (var o in Model)
+      {
+        <tr>
+          <td>#@o.Id</td>
+          <td>@o.User?.Email</td>
+          <td>@string.Join(", ", o.OrderItems?.Select(oi => oi.Course?.Title) ?? Array.Empty<string>())</td>
+          <td>₺@o.Total.ToString("N0")</td>
+          <td><span class="badge @(o.Status == "Paid" ? "badge-success" : o.Status == "Failed" ? "badge-warning" : "badge-primary")">@(o.Status == "Paid" ? "Ödendi" : o.Status == "Pending" ? "Beklemede" : o.Status == "Failed" ? "Başarısız" : o.Status == "Refunded" ? "İade Edildi" : o.Status)</span></td>
+          <td>@o.CreatedAt.ToString("d MMM yyyy HH:mm")</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+@if (Model.Count == 0) { <p style="color: var(--text-muted); margin-top: 16px;">Sipariş bulunamadı.</p> }

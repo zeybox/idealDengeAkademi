@@ -1,0 +1,49 @@
+@{
+  ViewData["Title"] = "Eğitmen Paneli";
+  int courseCount = ViewBag.CourseCount ?? 0;
+  int salesCount = ViewBag.SalesCount ?? 0;
+  decimal totalRevenue = ViewBag.TotalRevenue ?? 0;
+  var recentSales = ViewBag.RecentSales as IEnumerable<HizliOgren.Models.OrderItem> ?? Enumerable.Empty<HizliOgren.Models.OrderItem>();
+}
+<div class="stat-cards">
+  <div class="stat-card">
+    <h4>Eğitimlerim</h4>
+    <div class="value">@courseCount</div>
+    <a asp-controller="Courses" asp-action="Index" style="font-size: 0.85rem;">Tümünü gör</a>
+  </div>
+  <div class="stat-card">
+    <h4>Toplam Satış</h4>
+    <div class="value">@totalRevenue.ToString("N0") TL</div>
+  </div>
+  <div class="stat-card">
+    <h4>Satış Adedi</h4>
+    <div class="value">@salesCount</div>
+  </div>
+</div>
+<div class="card" style="padding: 24px;">
+  <h2 style="font-size: 1.25rem; margin-bottom: 20px;">Son Satışlar</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Tarih</th>
+          <th>Eğitim</th>
+          <th>Alıcı</th>
+          <th>Tutar</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach (var oi in recentSales)
+        {
+          <tr>
+            <td>@(oi.Order?.CreatedAt.ToString("d MMM yyyy"))</td>
+            <td>@(oi.Course?.Title)</td>
+            <td>@(oi.Order?.User?.Email)</td>
+            <td>@(oi.Price.ToString("N0")) TL</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  @if (!recentSales.Any()) { <p style="color: var(--text-muted);">Henüz satış yok.</p> }
+</div>

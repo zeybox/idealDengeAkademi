@@ -1,0 +1,212 @@
+@{
+  ViewData["Title"] = "Ana Sayfa";
+  var heroSlides = ViewBag.HeroSlides as List<HizliOgren.Models.HeroSlide> ?? new List<HizliOgren.Models.HeroSlide>();
+}
+@if (heroSlides.Any())
+{
+<!-- Hero Slider -->
+<section class="hero">
+  <div class="hero-slider" role="region" aria-label="Hero slayt">
+    <div class="hero-track">
+      @for (var i = 0; i < heroSlides.Count; i++)
+      {
+        var s = heroSlides[i];
+        <div class="hero-slide @(i == 0 ? "active" : "")" data-slide="@i">
+          <div class="hero-image">
+            <img src="@(string.IsNullOrEmpty(s.ImageUrl) ? Url.Content("~/images/hero-1.jpg") : s.ImageUrl)" alt="@(s.ImageAlt ?? s.Title)" draggable="false">
+          </div>
+          <div class="hero-content">
+            <h1>@s.Title</h1>
+            @if (!string.IsNullOrEmpty(s.Text))
+            {
+              <p>@s.Text</p>
+            }
+            <div class="hero-buttons">
+              <a asp-controller="Courses" asp-action="Index" class="btn btn-primary">Eğitimlere Göz At</a>
+              @if (User.Identity?.IsAuthenticated == true)
+              {
+                @if (User.IsInRole("Admin"))
+                {
+                  <a href="~/Admin" class="btn btn-secondary">Admin</a>
+                }
+                else if (User.IsInRole("Egitmen"))
+                {
+                  <a href="~/Egitmen" class="btn btn-secondary">Eğitmen Paneli</a>
+                }
+                else
+                {
+                  <a asp-controller="Dashboard" asp-action="Index" class="btn btn-secondary">Hesabım</a>
+                }
+              }
+              else
+              {
+                <a asp-controller="Auth" asp-action="Register" class="btn btn-secondary">Kayıt Ol</a>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+  <div class="hero-dots" aria-label="Slayt seçin">
+    @for (var i = 0; i < heroSlides.Count; i++)
+    {
+      <button type="button" class="hero-dot @(i == 0 ? "active" : "")" data-slide="@i" aria-label="@(i + 1). slayt" @(i == 0 ? "aria-current=\"true\"" : "")>@(i + 1)</button>
+    }
+  </div>
+</section>
+}
+
+<section class="section">
+  <div class="container">
+    <div class="features">
+      <div class="feature-card">
+        <div class="feature-icon">📹</div>
+        <h3>@(ViewData["Feature1Title"] ?? "1000+ Mikro Eğitim")</h3>
+        <p>@(ViewData["Feature1Text"] ?? "Soru ve cevaplarla farkındalığınızı artırın. Video, PDF ve makalelerle öğrenin.")</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎓</div>
+        <h3>@(ViewData["Feature2Title"] ?? "Uzmanlaşın")</h3>
+        <p>@(ViewData["Feature2Text"] ?? "Alanında uzman eğitmenlerden doğru eğitimi alın. Uygulanabilir, güncel içerikler.")</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📱</div>
+        <h3>@(ViewData["Feature3Title"] ?? "Kolay Erişim")</h3>
+        <p>@(ViewData["Feature3Text"] ?? "Eğitimlerinize ister bilgisayardan ister mobil cihazdan erişin.")</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background: var(--bg-soft);">
+  <div class="container">
+    <h2 class="section-title">@(ViewData["SectionEgitimlerTitle"] ?? "Eğitimler")</h2>
+    <p class="section-subtitle">@(ViewData["SectionEgitimlerSubtitle"] ?? "Popüler eğitimlerimizi keşfedin ve hemen öğrenmeye başlayın.")</p>
+    <div class="category-list">
+      <a asp-controller="Courses" asp-action="Index" class="category-pill active">Tümü</a>
+      <a asp-controller="Courses" asp-action="Index" asp-route-cat="iletisim" class="category-pill">İletişim</a>
+      <a asp-controller="Courses" asp-action="Index" asp-route-cat="liderlik" class="category-pill">Liderlik</a>
+      <a asp-controller="Courses" asp-action="Index" asp-route-cat="kisisel" class="category-pill">Kişisel Gelişim</a>
+      <a asp-controller="Courses" asp-action="Index" asp-route-cat="satis" class="category-pill">Satış</a>
+    </div>
+    <div class="course-grid">
+      @if (ViewBag.FeaturedCourses is IEnumerable<HizliOgren.Models.Course> featured && featured.Any())
+      {
+        @foreach (var c in featured)
+        {
+          <article class="card">
+            <img src="@(string.IsNullOrEmpty(c.ImageUrl) ? "https://placehold.co/400x250/e0f2f1/0f766e?text=" + Uri.EscapeDataString(c.Title) : c.ImageUrl)" alt="@c.Title" class="card-img">
+            <div class="card-body">
+              <h3 class="card-title">@c.Title</h3>
+              <div class="card-meta">
+                <span>@c.Category?.Name</span>
+                @{ var totalMin = (c.CurriculumItems ?? new List<HizliOgren.Models.CurriculumItem>()).Where(x => x.Type == "video").Sum(x => x.DurationMinutes ?? 0); }
+                <span>@(totalMin > 0 ? "⏱ " + totalMin + " dk" : "⏱ Eğitim")</span>
+              </div>
+              @if (c.Instructor != null)
+              {
+                <a asp-controller="Instructors" asp-action="Profile" asp-route-id="@c.Instructor.Id" style="display: flex; align-items: center; gap: 8px; margin-top: 10px; color: var(--text-muted); font-size: 0.9rem; text-decoration: none;">
+                  @if (!string.IsNullOrWhiteSpace(c.Instructor.AvatarUrl))
+                  { <img src="@c.Instructor.AvatarUrl" alt="" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover;" /> }
+                  else
+                  { <span style="width: 24px; height: 24px; background: var(--bg-soft); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem;">👤</span> }
+                  <span>@c.Instructor.FullName</span>
+                </a>
+              }
+            </div>
+            <div class="card-footer">
+              <span class="card-price">₺@c.Price.ToString("N0")</span>
+              <a asp-controller="Courses" asp-action="Detail" asp-route-id="@c.Id" class="btn btn-primary">İncele</a>
+            </div>
+          </article>
+        }
+      }
+      else
+      {
+        <article class="card">
+          <img src="https://placehold.co/400x250/e0f2f1/0f766e?text=Egitim" alt="Eğitim" class="card-img">
+          <div class="card-body">
+            <h3 class="card-title">Eğitimler</h3>
+            <div class="card-meta"><span>Kategoriler</span></div>
+          </div>
+          <div class="card-footer">
+            <span class="card-price">—</span>
+            <a asp-controller="Courses" asp-action="Index" class="btn btn-primary">Tüm Eğitimler</a>
+          </div>
+        </article>
+      }
+    </div>
+    <p style="text-align: center; margin-top: 32px;">
+      <a asp-controller="Courses" asp-action="Index" class="btn btn-outline">Tüm Eğitimleri Gör</a>
+    </p>
+  </div>
+</section>
+
+<section class="section" style="background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white;">
+  <div class="container" style="text-align: center;">
+    <h2 style="font-size: 2rem; margin-bottom: 16px; color: white;">@(ViewData["SectionCtaTitle"] ?? "Eğitim Satın Al, Hemen Eriş")</h2>
+    <p style="max-width: 600px; margin: 0 auto 24px; opacity: 0.95;">@(ViewData["SectionCtaText"] ?? "İstediğiniz eğitimi satın alın; video, PDF ve makalelere süresiz erişin. Aldığınız her eğitim hesabınızda kalır.")</p>
+    <a asp-controller="Courses" asp-action="Index" class="btn" style="background: white; color: var(--primary);">Eğitimlere Göz At</a>
+  </div>
+</section>
+
+<section class="section" style="background: var(--bg-soft);">
+  <div class="container">
+    <h2 class="section-title">@(ViewData["SectionBlogTitle"] ?? "Blog")</h2>
+    <p class="section-subtitle">@(ViewData["SectionBlogSubtitle"] ?? "İpuçları, makaleler ve güncel yazılar. Herkese açık.")</p>
+    <div class="blog-grid">
+      @{
+        var latestPosts = ViewBag.LatestBlogPosts as List<HizliOgren.Models.BlogPost> ?? new List<HizliOgren.Models.BlogPost>();
+      }
+      @if (latestPosts.Any())
+      {
+        @foreach (var post in latestPosts)
+        {
+          <article class="card blog-card">
+            <a asp-controller="Blog" asp-action="Post" asp-route-slug="@post.Slug">
+              <img src="@(post.ImageUrl ?? "https://placehold.co/400x225/e0f2f1/0f766e?text=Blog")" alt="@post.Title" class="card-img">
+            </a>
+            <div class="card-body">
+              <div class="card-meta">
+                @if (post.PublishedAt.HasValue) { <span>@post.PublishedAt.Value.ToString("d MMM yyyy")</span> }
+                @if (post.Author != null) { <span>@post.Author.FullName</span> }
+              </div>
+              <h3 class="card-title"><a asp-controller="Blog" asp-action="Post" asp-route-slug="@post.Slug">@post.Title</a></h3>
+              <p style="color: var(--text-muted); font-size: 0.95rem;">@(post.Excerpt ?? "")</p>
+            </div>
+            <div class="card-footer">
+              <a asp-controller="Blog" asp-action="Post" asp-route-slug="@post.Slug" class="btn btn-ghost">Oku</a>
+            </div>
+          </article>
+        }
+      }
+      else
+      {
+        <article class="card blog-card">
+          <img src="https://placehold.co/400x225/e0f2f1/0f766e?text=Blog" alt="Blog" class="card-img">
+          <div class="card-body">
+            <div class="card-meta"><span>Blog</span></div>
+            <h3 class="card-title">Makaleler</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">Henüz yayınlanmış yazı yok. Yakında burada görünecek.</p>
+            <a asp-controller="Blog" asp-action="Index" class="btn btn-ghost" style="margin-top: 12px;">Blog Sayfası →</a>
+          </div>
+        </article>
+      }
+    </div>
+    <p style="text-align: center; margin-top: 32px;">
+      <a asp-controller="Blog" asp-action="Index" class="btn btn-outline">Tüm Yazılar</a>
+    </p>
+  </div>
+</section>
+
+<section class="section" id="hakkimizda">
+  <div class="container">
+    <h2 class="section-title">@(ViewData["SectionHakkimizdaTitle"] ?? "Hakkımızda")</h2>
+    <p class="section-subtitle">@(ViewData["SectionHakkimizdaSubtitle"] ?? "Hızlı Öğren, kişisel ve mesleki gelişim için tasarlanmış bir online eğitim platformudur. Alanında uzman eğitmenlerimizle hazırlanan video, PDF ve makalelerle kendinize yeni yetkinlikler kazandırın.")</p>
+    <div style="max-width: 700px; margin: 0 auto; text-align: center;">
+      <p style="color: var(--text-muted); margin-bottom: 20px;">Misyonumuz, değerlerimiz ve nasıl çalıştığımız hakkında daha fazla bilgi edinmek ister misiniz?</p>
+      <a asp-controller="Home" asp-action="Hakkimizda" class="btn btn-primary">@(ViewData["SectionHakkimizdaButton"] ?? "Hakkımızda")</a>
+    </div>
+  </div>
+</section>
