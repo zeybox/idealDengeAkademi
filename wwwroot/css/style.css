@@ -1,27 +1,27 @@
 /* ============================================
    EĞİTİM PLATFORMU - Ana Stil Dosyası
-   Tema: mehmetmizrak.com tarzı | Kurumsal lacivert & beyaz
+   Tema: demo.hizliogren.net.tr ile aynı renk paleti
    ============================================ */
 
 :root {
-  /* mehmetmizrak.com benzeri kurumsal eğitim paleti */
-  --primary: #1e3a5f;       /* ana lacivert (kurumsal) */
-  --primary-dark: #152a45;  /* koyu lacivert */
-  --primary-light: #8da9ca; /* vurgu lacivert */
-  --secondary: #2d3748;     /* ikincil koyu */
-  --accent: #ed8936;        /* turuncu CTA vurgu */
+  /* demo.hizliogren.net.tr renk paleti */
+  --primary: #0f766e;       /* ana teal (yeşil-mavi) */
+  --primary-dark: #0d5c56; /* koyu teal */
+  --primary-light: #14b8a6; /* açık teal vurgu */
+  --secondary: #0369a1;     /* mavi ikincil */
+  --accent: #ea580c;       /* turuncu CTA vurgu */
   --bg: #ffffff;
-  --bg-soft: #f7fafc;       /* hafif gri-beyaz bloklar */
+  --bg-soft: #f8fafc;      /* hafif gri-beyaz bloklar */
   --bg-card: #ffffff;
-  --text: #1a202c;
-  --text-muted: #718096;
-  --border: #e2e8f0;        /* nötr açık çizgi */
-  --success: #38a169;
-  --warning: #dd6b20;
-  --shadow: 0 1px 3px rgba(0,0,0,0.06);
-  --shadow-lg: 0 10px 40px rgba(30,58,95,0.08);
-  --radius: 10px;
-  --radius-sm: 6px;
+  --text: #1e293b;
+  --text-muted: #64748b;
+  --border: #e2e8f0;       /* nötr açık çizgi */
+  --success: #059669;
+  --warning: #d97706;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-lg: 0 10px 40px rgba(0,0,0,0.1);
+  --radius: 12px;
+  --radius-sm: 8px;
   --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --transition: 0.2s ease;
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -194,7 +194,7 @@ img {
   color: white;
   background: var(--primary-dark);
   transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 12px 28px rgba(30, 58, 95, 0.25);
+  box-shadow: 0 12px 28px rgba(15, 118, 110, 0.25);
 }
 
 .btn-secondary {
@@ -204,9 +204,9 @@ img {
 
 .btn-secondary:hover {
   color: white;
-  background: #2d3748;
+  background: #0284c7;
   transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 12px 28px rgba(45, 55, 72, 0.25);
+  box-shadow: 0 12px 28px rgba(3, 105, 161, 0.25);
 }
 
 .btn-outline {
@@ -219,7 +219,7 @@ img {
   background: var(--primary);
   color: white;
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(30, 58, 95, 0.2);
+  box-shadow: 0 8px 20px rgba(15, 118, 110, 0.2);
 }
 
 .btn-ghost {
@@ -402,7 +402,7 @@ img {
   min-width: 220px;
   background: var(--bg);
   border-radius: var(--radius-sm);
-  box-shadow: 0 20px 40px rgba(30, 58, 95, 0.15);
+  box-shadow: 0 20px 40px rgba(15, 118, 110, 0.15);
   padding: 8px;
   opacity: 0;
   visibility: hidden;
@@ -446,7 +446,7 @@ img {
 /* ========== HERO ========== */
 /* Hero Slider - mehmetmizrak.com tarzı soft arka plan */
 .hero {
-  background: linear-gradient(-45deg, #759ed3 0%, #edf2f7 50%, #759ed3 100%);
+  background: linear-gradient(135deg, #e3eef9 0%, #e0f2f1 100%);
   padding: 60px 0 80px;
   position: relative;
   overflow: hidden;
@@ -564,7 +564,7 @@ img {
 }
 
 .hero-dot:hover {
-  background: rgba(30, 58, 95, 0.25);
+  background: rgba(15, 118, 110, 0.25);
   transform: scale(1.2);
 }
 
@@ -585,7 +585,7 @@ img {
 
 .card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 20px 40px rgba(30, 58, 95, 0.12);
+  box-shadow: 0 20px 40px rgba(15, 118, 110, 0.12);
 }
 
 .card-img {
@@ -711,7 +711,7 @@ img {
 
 .category-pill.active {
   transform: scale(1.03);
-  box-shadow: 0 4px 14px rgba(30, 58, 95, 0.2);
+  box-shadow: 0 4px 14px rgba(15, 118, 110, 0.2);
 }
 
 /* ========== FEATURES ========== */
@@ -743,7 +743,7 @@ img {
 
 .feature-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 24px 48px rgba(30, 58, 95, 0.15);
+  box-shadow: 0 24px 48px rgba(15, 118, 110, 0.15);
 }
 
 .feature-card:hover .feature-icon {
@@ -778,7 +778,7 @@ img {
 /* ========== FOOTER ========== */
 .footer {
   /* Kurumsal koyu lacivert footer (mehmetmizrak.com tarzı) */
-  background: #1e3a5f;
+  background: var(--text);
   color: #cbd5e0;
   padding: 60px 0 24px;
   margin-top: 30px;
@@ -871,7 +871,7 @@ img {
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 32px 64px rgba(30, 58, 95, 0.2);
+  box-shadow: 0 32px 64px rgba(15, 118, 110, 0.2);
   transform: scale(0.92) translateY(20px);
   transition: transform var(--duration) var(--ease-out-expo);
 }
@@ -934,7 +934,7 @@ img {
 .form-control:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.12);
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
 }
 
 .form-control.error {
@@ -1180,7 +1180,7 @@ tr:hover td {
 }
 
 .badge-primary {
-  background: rgba(30, 58, 95, 0.12);
+  background: rgba(15, 118, 110, 0.12);
   color: var(--primary);
 }
 
@@ -1389,7 +1389,7 @@ tr:hover td {
 }
 
 .admin-sidebar {
-  background: #1e3a5f;
+  background: var(--primary);
   color: #cbd5e0;
   padding: 0;
   position: sticky;
