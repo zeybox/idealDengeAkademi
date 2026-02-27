@@ -21,7 +21,7 @@ public class SettingsController : Controller
 
     public async Task<IActionResult> Index(CancellationToken ct = default)
     {
-        var keys = new[] { "SiteName", "SiteDescription", "DefaultCoursePrice", "ContactEmail", "PayTR_MerchantId", "PayTR_MerchantKey", "PayTR_MerchantSalt", "Google_ClientId", "Google_ClientSecret", "AboutPageContent" };
+        var keys = new[] { "SiteName", "SiteDescription", "DefaultCoursePrice", "ContactEmail", "PayTR_MerchantId", "PayTR_MerchantKey", "PayTR_MerchantSalt", "Google_ClientId", "Google_ClientSecret", "AboutPageContent", "MetaDescriptionDefault", "SiteUrl" };
         var dict = new Dictionary<string, string?>();
         foreach (var k in keys) dict[k] = await _settings.GetAsync(k, ct);
         ViewBag.Settings = dict;
@@ -48,6 +48,17 @@ public class SettingsController : Controller
         await _settings.SetAsync("ContactEmail", ContactEmail, ct);
         TempData["Toast"] = "Genel ayarlar kaydedildi.";
         return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> SEO(string? SiteName, string? MetaDescriptionDefault, string? SiteUrl, CancellationToken ct = default)
+    {
+        await _settings.SetAsync("SiteName", SiteName, ct);
+        await _settings.SetAsync("MetaDescriptionDefault", MetaDescriptionDefault, ct);
+        await _settings.SetAsync("SiteUrl", SiteUrl, ct);
+        TempData["Toast"] = "SEO ayarları kaydedildi.";
+        return RedirectToAction(nameof(Index), new { tab = "panel-seo" });
     }
 
     [HttpPost]

@@ -23,24 +23,10 @@
             }
             <div class="hero-buttons">
               <a asp-controller="Courses" asp-action="Index" class="btn btn-primary">Eğitimlere Göz At</a>
-              @if (User.Identity?.IsAuthenticated == true)
-              {
-                @if (User.IsInRole("Admin"))
-                {
-                  <a href="~/Admin" class="btn btn-secondary">Admin</a>
-                }
-                else if (User.IsInRole("Egitmen"))
-                {
-                  <a href="~/Egitmen" class="btn btn-secondary">Eğitmen Paneli</a>
-                }
-                else
-                {
-                  <a asp-controller="Dashboard" asp-action="Index" class="btn btn-secondary">Hesabım</a>
-                }
-              }
-              else
+              @if (User.Identity?.IsAuthenticated == false)
               {
                 <a asp-controller="Auth" asp-action="Register" class="btn btn-secondary">Kayıt Ol</a>
+                
               }
             </div>
           </div>
@@ -203,7 +189,7 @@
 <section class="section" id="hakkimizda">
   <div class="container">
     <h2 class="section-title">@(ViewData["SectionHakkimizdaTitle"] ?? "Hakkımızda")</h2>
-    <p class="section-subtitle">@(ViewData["SectionHakkimizdaSubtitle"] ?? "Hızlı Öğren, kişisel ve mesleki gelişim için tasarlanmış bir online eğitim platformudur. Alanında uzman eğitmenlerimizle hazırlanan video, PDF ve makalelerle kendinize yeni yetkinlikler kazandırın.")</p>
+    <p class="section-subtitle">@(ViewData["SectionHakkimizdaSubtitle"] ?? "İdeal Denge Akademi, kişisel ve mesleki gelişim için tasarlanmış bir online eğitim platformudur. Alanında uzman eğitmenlerimizle hazırlanan video, PDF ve makalelerle kendinize yeni yetkinlikler kazandırın.")</p>
     <div style="max-width: 700px; margin: 0 auto; text-align: center;">
       <p style="color: var(--text-muted); margin-bottom: 20px;">Misyonumuz, değerlerimiz ve nasıl çalıştığımız hakkında daha fazla bilgi edinmek ister misiniz?</p>
       <a asp-controller="Home" asp-action="Hakkimizda" class="btn btn-primary">@(ViewData["SectionHakkimizdaButton"] ?? "Hakkımızda")</a>

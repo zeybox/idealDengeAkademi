@@ -22,7 +22,9 @@ public class LoadSiteTextsFilter : IAsyncResultFilter
                     : SiteTextKeys.GetDefault(key);
             }
             controller.ViewData["SiteName"] = await _settings.GetAsync("SiteName", context.HttpContext.RequestAborted)
-                ?? "Hızlı Öğren";
+                ?? "İdeal Denge Akademi";
+            var siteUrl = await _settings.GetAsync("SiteUrl", context.HttpContext.RequestAborted);
+            controller.ViewData["SiteUrl"] = !string.IsNullOrWhiteSpace(siteUrl) ? siteUrl.Trim() : null;
         }
         await next();
     }

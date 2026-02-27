@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>@(ViewData["Title"] != null ? ViewData["Title"] + " | " : "")@(ViewData["SiteName"] ?? "Hızlı Öğren") - www.hizliogren.net.tr</title>
-  <meta name="description" content="@(ViewData["MetaDescription"] ?? ViewData["MetaDescriptionDefault"] ?? "Hızlı Öğren ile online eğitimlere katılın. Video, PDF ve makalelerle kişisel ve mesleki gelişim.")" />
+  <title>@(ViewData["Title"] != null ? ViewData["Title"] + " | " : "")@(ViewData["SiteName"] ?? "İdeal Denge Akademi")@(ViewData["SiteUrl"] != null ? " - " + ViewData["SiteUrl"] : " - www.idealdengeakademi.com")</title>
+  <meta name="description" content="@(ViewData["MetaDescription"] ?? ViewData["MetaDescriptionDefault"] ?? "İdeal Denge Akademi ile online eğitimlere katılın. Video, PDF ve makalelerle kişisel ve mesleki gelişim.")" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <!-- Plus Jakarta Sans: Türkçe karakter (ç,ğ,ı,ö,ş,ü,İ) destekli, ekran okuması için uygun -->
@@ -16,7 +16,7 @@
   <header class="header">
     <div class="container">
       <nav class="nav">
-        <a asp-controller="Home" asp-action="Index" class="logo"><img src="~/images/Logo.png" alt="@(ViewData["SiteName"] ?? "Hızlı Öğren")"></a>
+        <a asp-controller="Home" asp-action="Index" class="logo"><img src="~/images/Logo.png" alt="@(ViewData["SiteName"] ?? "İdeal Denge Akademi")"></a>
         <ul class="nav-links">
           <li><a asp-controller="Home" asp-action="Index">Ana Sayfa</a></li>
           <li class="dropdown">
@@ -66,7 +66,7 @@
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
-          <a asp-controller="Home" asp-action="Index" class="logo"><img src="~/images/Logo.png" alt="@(ViewData["SiteName"] ?? "Hızlı Öğren")"></a>
+          <a asp-controller="Home" asp-action="Index" class="logo"><img src="~/images/Logo.png" alt="@(ViewData["SiteName"] ?? "İdeal Denge Akademi")"></a>
           <p>@(ViewData["FooterTagline"] ?? "Öğrenmek hiç bu kadar hızlı olmamıştı. Hemen başlayın — ilk eğitiminiz bir tık uzağınızda.")</p>
         </div>
         <div>
@@ -94,7 +94,7 @@
         </div>
       </div>
       <div class="footer-bottom">
-        <p>@(string.Format(ViewData["FooterCopyright"] as string ?? "© {0} Hızlı Öğren (www.hizliogren.net.tr). Tüm hakları saklıdır.", DateTime.UtcNow.Year))</p>
+        <p>@(string.Format(ViewData["FooterCopyright"] as string ?? "© {0} İdeal Denge Akademi (www.idealdengeakademi.com). Tüm hakları saklıdır.", DateTime.UtcNow.Year))</p>
       </div>
     </div>
   </footer>
