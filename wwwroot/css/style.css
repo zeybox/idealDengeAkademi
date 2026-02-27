@@ -7,7 +7,7 @@
   /* mehmetmizrak.com benzeri kurumsal eğitim paleti */
   --primary: #1e3a5f;       /* ana lacivert (kurumsal) */
   --primary-dark: #152a45;  /* koyu lacivert */
-  --primary-light: #2c5282; /* vurgu lacivert */
+  --primary-light: #8da9ca; /* vurgu lacivert */
   --secondary: #2d3748;     /* ikincil koyu */
   --accent: #ed8936;        /* turuncu CTA vurgu */
   --bg: #ffffff;
@@ -191,6 +191,7 @@ img {
 }
 
 .btn-primary:hover {
+  color: white;
   background: var(--primary-dark);
   transform: translateY(-2px) scale(1.02);
   box-shadow: 0 12px 28px rgba(30, 58, 95, 0.25);
@@ -202,6 +203,7 @@ img {
 }
 
 .btn-secondary:hover {
+  color: white;
   background: #2d3748;
   transform: translateY(-2px) scale(1.02);
   box-shadow: 0 12px 28px rgba(45, 55, 72, 0.25);
@@ -444,7 +446,7 @@ img {
 /* ========== HERO ========== */
 /* Hero Slider - mehmetmizrak.com tarzı soft arka plan */
 .hero {
-  background: linear-gradient(180deg, #f7fafc 0%, #edf2f7 50%, #ffffff 100%);
+  background: linear-gradient(-45deg, #759ed3 0%, #edf2f7 50%, #759ed3 100%);
   padding: 60px 0 80px;
   position: relative;
   overflow: hidden;
