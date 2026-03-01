@@ -1,35 +1,46 @@
-@model HizliOgren.Models.User
+@model HizliOgren.Models.AdminUserCreateModel
 @{
-  ViewData["Title"] = "Profilim";
+  ViewData["Title"] = "Yeni kullanıcı ekle";
 }
 <div class="card" style="padding: 24px; max-width: 720px;">
-  <h2>Profil Bilgilerim</h2>
-  <p class="form-text" style="margin-bottom: 20px;">Bu bilgiler eğitim sayfalarında ve öğrenciler tarafından görülebilir.</p>
-  <form asp-action="Index" method="post">
+  <h2>Yeni kullanıcı ekle</h2>
+  <form asp-action="Create" method="post">
     @Html.AntiForgeryToken()
     <div class="form-row" style="display: flex; gap: 24px; flex-wrap: wrap;">
       <div style="flex: 1; min-width: 200px;">
         <div class="form-group">
           <label asp-for="FullName">Ad Soyad</label>
-          <input asp-for="FullName" class="form-control" required maxlength="200" />
+          <input asp-for="FullName" class="form-control" maxlength="200" placeholder="Ad Soyad" />
           <span asp-validation-for="FullName" class="text-danger"></span>
         </div>
         <div class="form-group">
-          <label>E-posta</label>
-          <input type="text" class="form-control" value="@Model.Email" disabled readonly style="background: var(--bg-soft);" />
-          <p class="form-text" style="margin-top: 4px;">E-posta değiştirmek için yönetici ile iletişime geçin.</p>
+          <label asp-for="Email">E-posta</label>
+          <input asp-for="Email" type="email" class="form-control" maxlength="256" placeholder="ornek@email.com" />
+          <span asp-validation-for="Email" class="text-danger"></span>
         </div>
         <div class="form-group">
-          <label asp-for="Title">Unvan</label>
-          <input asp-for="Title" class="form-control" maxlength="150" placeholder="Örn. Yazılım Eğitmeni" />
+          <label asp-for="Role">Rol</label>
+          <select asp-for="Role" class="form-control" asp-items="ViewBag.Roles"></select>
+        </div>
+        <div class="form-group">
+          <label asp-for="Password">Şifre</label>
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <input type="password" asp-for="Password" id="Password" class="form-control" placeholder="En az 6 karakter" maxlength="256" style="max-width: 240px;" />
+            <button type="button" id="togglePassword" class="btn btn-ghost" aria-label="Şifreyi göster/gizle" title="Şifreyi göster">👁</button>
+          </div>
+          <span asp-validation-for="Password" class="text-danger"></span>
         </div>
         <div class="form-group">
           <label asp-for="City">Şehir</label>
           <select asp-for="City" class="form-control" asp-items="ViewBag.CityList"></select>
         </div>
         <div class="form-group">
+          <label asp-for="Title">Unvan (eğitmen için)</label>
+          <input asp-for="Title" class="form-control" maxlength="150" placeholder="Örn. Yazılım Eğitmeni" />
+        </div>
+        <div class="form-group">
           <label asp-for="Phone">Telefon</label>
-          <input asp-for="Phone" class="form-control" maxlength="50" placeholder="İsteğe bağlı" />
+          <input asp-for="Phone" class="form-control" maxlength="50" />
         </div>
       </div>
       <div class="form-group" style="min-width: 160px;">
@@ -44,16 +55,29 @@
       </div>
     </div>
     <div class="form-group">
-      <label asp-for="Bio">Kısa biyografi / Hakkında</label>
-      <textarea asp-for="Bio" class="form-control" rows="4" maxlength="2000" placeholder="Kendinizi ve uzmanlık alanlarınızı kısaca tanıtın. Eğitim sayfalarında görünür."></textarea>
-      <p class="form-text" style="margin-top: 4px;">En fazla 2000 karakter.</p>
+      <label asp-for="Bio">Biyografi / Hakkında</label>
+      <textarea asp-for="Bio" class="form-control" rows="4" maxlength="2000"></textarea>
     </div>
-    <button type="submit" class="btn btn-primary">Kaydet</button>
-    <a asp-controller="Home" asp-action="Index" class="btn btn-ghost">İptal</a>
+    <button type="submit" class="btn btn-primary">Kullanıcı ekle</button>
+    <a asp-action="Index" class="btn btn-ghost">İptal</a>
   </form>
 </div>
 @section Scripts {
   <partial name="_ValidationScriptsPartial" />
+  <script>
+    (function() {
+      var pwd = document.getElementById('Password');
+      var toggleBtn = document.getElementById('togglePassword');
+      if (toggleBtn && pwd) {
+        toggleBtn.addEventListener('click', function() {
+          var type = pwd.type === 'password' ? 'text' : 'password';
+          pwd.type = type;
+          toggleBtn.textContent = type === 'password' ? '👁' : '🙈';
+          toggleBtn.title = type === 'password' ? 'Şifreyi göster' : 'Şifreyi gizle';
+        });
+      }
+    })();
+  </script>
   <script>
     (function() {
       var uploadUrl = '@Url.Action("Image", "Upload", new { area = "" })';

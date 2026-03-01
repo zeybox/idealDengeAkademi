@@ -124,6 +124,7 @@ document.addEventListener('DOMContentLoaded', function() {
           localStorage.setItem('cart', JSON.stringify(cart));
           updateCartCountFromStorage();
           if (typeof showToast === 'function') showToast('Sepete eklendi');
+          else if (typeof showAlertModal === 'function') showAlertModal('Sepete eklendi!');
           else alert('Sepete eklendi!');
         }
       } catch (_) {}

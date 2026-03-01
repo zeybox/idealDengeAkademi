@@ -58,11 +58,9 @@
                   <button type="submit" class="btn btn-ghost" style="padding: 4px 8px; font-size: 0.85rem;" @(i == count - 1 ? "disabled" : "") title="Aşağı">↓</button>
                 </form>
                 <a asp-action="Edit" asp-route-id="@s.Id" class="btn btn-ghost" style="padding: 6px 12px; font-size: 0.85rem;">Düzenle</a>
-                <form asp-action="Delete" method="post" style="display:inline;" onsubmit="return confirm('Bu slaytı silmek istediğinize emin misiniz?');">
-                  @Html.AntiForgeryToken()
-                  <input type="hidden" name="id" value="@s.Id" />
-                  <button type="submit" class="btn btn-ghost" style="padding: 6px 12px; font-size: 0.85rem;">Kaldır</button>
-                </form>
+                <button type="button" class="btn btn-ghost" style="padding: 6px 12px; font-size: 0.85rem;" data-confirm-delete
+                  data-delete-action="@Url.Action("Delete", "HeroSlides", new { area = "Admin", id = s.Id })"
+                  data-delete-message="Bu slaytı silmek istediğinize emin misiniz?">Kaldır</button>
               </td>
             </tr>
           }

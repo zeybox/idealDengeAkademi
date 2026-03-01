@@ -12,7 +12,10 @@
   </select>
   <button type="submit" class="btn btn-ghost">Filtrele</button>
 </form>
-
+@if (TempData["Message"] != null)
+{
+  <p class="alert alert-success" style="margin-bottom: 16px;">@TempData["Message"]</p>
+}
 <div class="table-wrap">
   <table>
     <thead>
@@ -40,7 +43,16 @@
           </td>
           <td>@(a.UserId.HasValue ? "Evet (Üye #" + a.UserId + ")" : "Misafir")</td>
           <td>@a.CreatedAt.ToString("d MMM yyyy HH:mm")</td>
-          <td><a asp-action="Detail" asp-route-id="@a.Id" class="btn btn-ghost btn-sm">Detay</a></td>
+          <td>
+            <a asp-action="Detail" asp-route-id="@a.Id" class="btn btn-ghost btn-sm">Detay</a>
+            @if (a.Status == HizliOgren.Models.InstructorApplicationStatus.Pending)
+            {
+              <form method="post" asp-action="Accept" asp-route-id="@a.Id" style="display: inline;">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-primary btn-sm">Başvuruyu Kabul Et</button>
+              </form>
+            }
+          </td>
         </tr>
       }
     </tbody>

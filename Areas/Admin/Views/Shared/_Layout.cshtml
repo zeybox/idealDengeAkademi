@@ -10,27 +10,42 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="@Url.Content(ViewData["FaviconUrl"] as string ?? "~/images/Logo.png")" />
   <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
+  <script src="https://unpkg.com/lucide@0.454.0/dist/umd/lucide.min.js" crossorigin="anonymous"></script>
 </head>
 <body>
   <div class="admin-layout">
     <aside class="admin-sidebar">
       <a asp-area="" asp-controller="Home" asp-action="Index" class="logo"><img src="@Url.Content(ViewData["AdminLogoUrl"] as string ?? ViewData["SiteLogoUrl"] as string ?? "~/images/Logo.png")" alt="@(ViewData["SiteName"] ?? "İdeal Denge Akademi")"></a>
       <nav class="admin-nav">
-        <a asp-area="Admin" asp-controller="Home" asp-action="Index">📊 Yönetim Paneli</a>
-        <a asp-area="Admin" asp-controller="Users" asp-action="Index">👥 Kullanıcılar</a>
-        <a asp-area="Admin" asp-controller="InstructorApplications" asp-action="Index">📋 Eğitmen Başvuruları</a>
-        <a asp-area="Admin" asp-controller="Courses" asp-action="Index">📚 Eğitimler</a>
-        <a asp-area="Admin" asp-controller="Blog" asp-action="Index">📝 Blog</a>
-        <a asp-area="Admin" asp-controller="Orders" asp-action="Index">📦 Siparişler</a>
-        <a asp-area="Admin" asp-controller="HeroSlides" asp-action="Index">🖼️ Slaytlar</a>
-        <a asp-area="Admin" asp-controller="Settings" asp-action="Index">⚙️ Ayarlar</a>
-        <a asp-area="Admin" asp-controller="SiteTexts" asp-action="Index">📄 Site Sabit Yazılar</a>
-        <a asp-area="" asp-controller="Home" asp-action="Index" style="margin-top: 24px; border-top: 1px solid #334155; padding-top: 24px;">← Siteye Dön</a>
+        <a asp-area="Admin" asp-controller="Home" asp-action="Index"><i data-lucide="layout-dashboard" class="nav-icon" aria-hidden="true"></i><span>Yönetim Paneli</span></a>
+        <a asp-area="Admin" asp-controller="Users" asp-action="Index"><i data-lucide="users" class="nav-icon" aria-hidden="true"></i><span>Kullanıcılar</span></a>
+        <a asp-area="Admin" asp-controller="InstructorApplications" asp-action="Index"><i data-lucide="clipboard-list" class="nav-icon" aria-hidden="true"></i><span>Eğitmen Başvuruları</span></a>
+        <a asp-area="Admin" asp-controller="Courses" asp-action="Index"><i data-lucide="book-open" class="nav-icon" aria-hidden="true"></i><span>Eğitimler</span></a>
+        <a asp-area="Admin" asp-controller="Blog" asp-action="Index"><i data-lucide="pen-line" class="nav-icon" aria-hidden="true"></i><span>Blog</span></a>
+        <a asp-area="Admin" asp-controller="Orders" asp-action="Index"><i data-lucide="package" class="nav-icon" aria-hidden="true"></i><span>Siparişler</span></a>
+        <a asp-area="Admin" asp-controller="HeroSlides" asp-action="Index"><i data-lucide="images" class="nav-icon" aria-hidden="true"></i><span>Slaytlar</span></a>
+        <a asp-area="Admin" asp-controller="Settings" asp-action="Index"><i data-lucide="settings" class="nav-icon" aria-hidden="true"></i><span>Ayarlar</span></a>
+        <a asp-area="Admin" asp-controller="SiteTexts" asp-action="Index"><i data-lucide="file-text" class="nav-icon" aria-hidden="true"></i><span>Site Sabit Yazılar</span></a>
+        <a asp-area="" asp-controller="Home" asp-action="Index" class="nav-back"><i data-lucide="arrow-left" class="nav-icon" aria-hidden="true"></i><span>Siteye Dön</span></a>
       </nav>
     </aside>
     <main class="admin-main">
+      @{
+        var controller = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+        var titleIcon = controller switch {
+          "Users" => "users",
+          "InstructorApplications" => "clipboard-list",
+          "Courses" => "book-open",
+          "Blog" => "pen-line",
+          "Orders" => "package",
+          "HeroSlides" => "images",
+          "Settings" => "settings",
+          "SiteTexts" => "file-text",
+          _ => "layout-dashboard"
+        };
+      }
       <div class="admin-header">
-        <h1>@ViewData["Title"]</h1>
+        <h1 class="admin-page-title"><i data-lucide="@titleIcon" class="header-title-icon" aria-hidden="true"></i><span>@ViewData["Title"]</span></h1>
         <div style="display: flex; gap: 12px; align-items: center;">
           <span style="color: var(--text-muted); font-size: 0.9rem;">Admin</span>
           <a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-ghost">Siteye Git</a>
@@ -44,7 +59,12 @@
     </main>
   </div>
   <script src="~/js/main.js" asp-append-version="true"></script>
-  @await RenderSectionAsync("Scripts", required: false)
   @await Html.PartialAsync("_ConfirmModal")
+  @await RenderSectionAsync("Scripts", required: false)
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.lucide) lucide.createIcons();
+    });
+  </script>
 </body>
 </html>

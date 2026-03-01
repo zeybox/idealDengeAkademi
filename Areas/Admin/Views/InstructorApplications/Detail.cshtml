@@ -64,5 +64,18 @@
       </div>
     }
   </dl>
-  <a asp-action="Index" class="btn btn-ghost">← Listeye Dön</a>
+  <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+    <a asp-action="Index" class="btn btn-ghost">← Listeye Dön</a>
+    @if (Model.Status == HizliOgren.Models.InstructorApplicationStatus.Pending)
+    {
+      <form method="post" asp-action="Accept" asp-route-id="@Model.Id" style="display: inline;">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn btn-primary">Başvuruyu Kabul Et</button>
+      </form>
+    }
+  </div>
+  @if (TempData["Message"] != null)
+  {
+    <p class="alert alert-success" style="margin-top: 20px;">@TempData["Message"]</p>
+  }
 </div>

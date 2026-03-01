@@ -1,6 +1,6 @@
-@* Silme / onay modalı - js alert kullanılmaz *@
+@* Silme / onay modalı - js alert/confirm kullanılmaz *@
 <div class="modal-overlay" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
-  <div class="modal" style="padding: 28px;">
+  <div class="modal confirm-modal-box" style="padding: 28px;">
     <h3 id="confirmModalTitle" style="font-size: 1.25rem; font-weight: 600; margin: 0 0 12px 0;">Emin misiniz?</h3>
     <p class="confirm-message" style="color: var(--text-muted); margin: 0 0 24px 0; line-height: 1.5;"></p>
     <div style="display: flex; gap: 12px; justify-content: flex-end; flex-wrap: wrap;">
@@ -9,6 +9,15 @@
         @Html.AntiForgeryToken()
         <button type="submit" class="btn btn-primary confirm-submit-btn">Evet, sil</button>
       </form>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="alertModal" role="dialog" aria-modal="true" aria-labelledby="alertModalTitle">
+  <div class="modal confirm-modal-box" style="padding: 28px;">
+    <h3 id="alertModalTitle" style="font-size: 1.25rem; font-weight: 600; margin: 0 0 12px 0;">Bilgi</h3>
+    <p class="alert-message" style="color: var(--text-muted); margin: 0 0 24px 0; line-height: 1.5;"></p>
+    <div style="display: flex; justify-content: flex-end;">
+      <button type="button" class="btn btn-primary alert-close-btn">Tamam</button>
     </div>
   </div>
 </div>
@@ -43,6 +52,23 @@
     });
     var closeBtn = confirmOverlay.querySelector('.modal-close');
     if (closeBtn) closeBtn.addEventListener('click', function() { confirmOverlay.classList.remove('active'); document.body.style.overflow = ''; });
+  }
+  function showAlertModal(message) {
+    var overlay = document.getElementById('alertModal');
+    if (!overlay) return;
+    var msg = overlay.querySelector('.alert-message');
+    if (msg) msg.textContent = message || '';
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+  window.showAlertModal = showAlertModal;
+  var alertOverlay = document.getElementById('alertModal');
+  if (alertOverlay) {
+    alertOverlay.addEventListener('click', function(e) {
+      if (e.target === alertOverlay) { alertOverlay.classList.remove('active'); document.body.style.overflow = ''; }
+    });
+    var alertClose = alertOverlay.querySelector('.alert-close-btn');
+    if (alertClose) alertClose.addEventListener('click', function() { alertOverlay.classList.remove('active'); document.body.style.overflow = ''; });
   }
 })();
 </script>

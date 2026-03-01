@@ -72,7 +72,7 @@
               if (coverPreview) { coverPreview.src = res.url; coverPreview.style.display = 'block'; }
               if (coverPlaceholder) coverPlaceholder.style.display = 'none';
             })
-            .catch(function(err) { alert(err.message || 'Yükleme hatası'); })
+            .catch(function(err) { (window.showAlertModal || alert)(err.message || 'Yükleme hatası'); })
             .finally(function() { coverBtn.disabled = false; coverInput.value = ''; });
         });
       }

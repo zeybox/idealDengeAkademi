@@ -215,11 +215,9 @@
                 <input type="hidden" name="direction" value="down" />
                 <button type="submit" class="btn btn-ghost" style="padding: 4px 8px; font-size: 0.85rem;" @(i == count - 1 ? "disabled" : "") title="Aşağı">↓</button>
               </form>
-              <form asp-action="CategoryDelete" method="post" style="display:inline;" onsubmit="return confirm('Bu kategoriyi silmek istediğinize emin misiniz?');">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="id" value="@c.Id" />
-                <button type="submit" class="btn btn-ghost" style="padding: 6px 12px; font-size: 0.85rem;">Kaldır</button>
-              </form>
+              <button type="button" class="btn btn-ghost" style="padding: 6px 12px; font-size: 0.85rem;" data-confirm-delete
+                data-delete-action="@Url.Action("CategoryDelete", "Settings", new { area = "Admin", id = c.Id })"
+                data-delete-message="Bu kategoriyi silmek istediğinize emin misiniz?">Kaldır</button>
             </td>
           </tr>
         }

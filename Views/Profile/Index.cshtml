@@ -93,7 +93,7 @@
               if (preview) { preview.src = res.url; preview.style.display = 'block'; }
               if (placeholder) placeholder.style.display = 'none';
             })
-            .catch(function(err) { alert(err.message || 'Yükleme hatası'); })
+            .catch(function(err) { (window.showAlertModal || alert)(err.message || 'Yükleme hatası'); })
             .finally(function() { btn.disabled = false; input.value = ''; });
         });
       }

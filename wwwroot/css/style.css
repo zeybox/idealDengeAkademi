@@ -1173,7 +1173,7 @@ table {
 }
 
 th, td {
-  padding: 16px 20px;
+  padding: 10px 10px;
   text-align: left;
   border-bottom: 1px solid var(--border);
 }
@@ -1529,6 +1529,25 @@ tr:hover td {
   color: white;
 }
 
+/* Sidebar ikonları – Lucide, tek renk (link rengini miras alır) */
+.admin-nav a > svg,
+.admin-nav .nav-icon {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  flex-shrink: 0;
+  color: currentColor;
+  stroke: currentColor;
+}
+.admin-nav a > svg {
+  display: block;
+}
+.admin-nav a.nav-back {
+  margin-top: 24px;
+  border-top: 1px solid rgba(255,255,255,0.12);
+  padding-top: 24px;
+}
+
 .admin-main {
   background: var(--bg-soft);
   padding: 32px;
@@ -1548,6 +1567,20 @@ tr:hover td {
   font-size: 1.75rem;
   font-weight: 700;
   color: var(--text);
+}
+
+.admin-page-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+.admin-page-title .header-title-icon,
+.admin-page-title > svg {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  color: var(--primary);
+  stroke: var(--primary);
 }
 
 /* ========== TABS ========== */

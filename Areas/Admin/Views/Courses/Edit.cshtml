@@ -104,7 +104,7 @@
               if (coverPreview) { coverPreview.src = res.url; coverPreview.style.display = 'block'; }
               if (coverPlaceholder) coverPlaceholder.style.display = 'none';
             })
-            .catch(function(err) { alert(err.message || 'Yükleme hatası'); })
+            .catch(function(err) { (window.showAlertModal || alert)(err.message || 'Yükleme hatası'); })
             .finally(function() { coverBtn.disabled = false; coverInput.value = ''; });
         });
       }
@@ -182,7 +182,7 @@
                 var html = '<p><a href="' + res.url + '">📄 ' + escapeHtml(name) + '</a></p>';
                 editor.setData(editor.getData() + html);
               })
-              .catch(function(err) { alert(err.message || 'PDF yüklenemedi.'); })
+              .catch(function(err) { (window.showAlertModal || alert)(err.message || 'PDF yüklenemedi.'); })
               .finally(function() { pdfBtn.disabled = false; pdfInput.value = ''; });
           });
         }

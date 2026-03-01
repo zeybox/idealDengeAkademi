@@ -35,6 +35,57 @@ public class UsersController : Controller
         return View(list);
     }
 
+    [HttpGet]
+    public IActionResult Create()
+    {
+        ViewBag.Roles = new SelectList(new[] {
+            new { Value = (int)UserRole.Uye, Text = "Üye" },
+            new { Value = (int)UserRole.Egitmen, Text = "Eğitmen" },
+            new { Value = (int)UserRole.Admin, Text = "Admin" }
+        }, "Value", "Text", (int)UserRole.Uye);
+        ViewBag.CityList = TurkishCities.GetCitySelectList(null);
+        return View(new AdminUserCreateModel { Role = UserRole.Uye });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(AdminUserCreateModel model, CancellationToken ct = default)
+    {
+        var email = (model.Email ?? "").Trim().ToLowerInvariant();
+        if (await _db.Users.AnyAsync(u => u.Email.ToLower() == email, ct))
+            ModelState.AddModelError("Email", "Bu e-posta adresi zaten kayıtlı.");
+
+        if (!ModelState.IsValid)
+        {
+            ViewBag.Roles = new SelectList(new[] {
+                new { Value = (int)UserRole.Uye, Text = "Üye" },
+                new { Value = (int)UserRole.Egitmen, Text = "Eğitmen" },
+                new { Value = (int)UserRole.Admin, Text = "Admin" }
+            }, "Value", "Text", (int)model.Role);
+            ViewBag.CityList = TurkishCities.GetCitySelectList(model.City);
+            return View(model);
+        }
+
+        var user = new User
+        {
+            Email = email,
+            FullName = (model.FullName ?? "").Trim(),
+            PasswordHash = _authService.HashPassword((model.Password ?? "").Trim()),
+            PlainPassword = (model.Password ?? "").Trim(),
+            Role = model.Role,
+            City = string.IsNullOrWhiteSpace(model.City) ? null : model.City.Trim(),
+            Title = string.IsNullOrWhiteSpace(model.Title) ? null : model.Title.Trim(),
+            Bio = string.IsNullOrWhiteSpace(model.Bio) ? null : model.Bio.Trim(),
+            AvatarUrl = string.IsNullOrWhiteSpace(model.AvatarUrl) ? null : model.AvatarUrl.Trim(),
+            Phone = string.IsNullOrWhiteSpace(model.Phone) ? null : model.Phone.Trim(),
+            CreatedAt = DateTime.UtcNow
+        };
+        _db.Users.Add(user);
+        await _db.SaveChangesAsync(ct);
+        TempData["Message"] = $"{user.FullName} kullanıcı olarak eklendi.";
+        return RedirectToAction(nameof(Index));
+    }
+
     public async Task<IActionResult> Edit(int id, CancellationToken ct = default)
     {
         var user = await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id, ct);
@@ -169,5 +220,36 @@ public class UsersController : Controller
             TempData["Toast"] = "Eğitim kaldırıldı.";
         }
         return RedirectToAction(nameof(EditCourses), new { id });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete(int id, CancellationToken ct = default)
+    {
+        var user = await _db.Users.FindAsync(new object[] { id }, ct);
+        if (user == null) return NotFound();
+
+        if (await _db.Courses.AnyAsync(c => c.InstructorId == id, ct))
+        {
+            TempData["Message"] = "Bu kullanıcı eğitmen olarak atanmış eğitimlere sahip. Önce eğitimlerin eğitmenini değiştirin.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        var orders = await _db.Orders.Where(o => o.UserId == id).ToListAsync(ct);
+        foreach (var order in orders)
+        {
+            var items = await _db.OrderItems.Where(oi => oi.OrderId == order.Id).ToListAsync(ct);
+            _db.OrderItems.RemoveRange(items);
+        }
+        _db.Orders.RemoveRange(orders);
+        _db.UserCourses.RemoveRange(await _db.UserCourses.Where(uc => uc.UserId == id).ToListAsync(ct));
+        var apps = await _db.InstructorApplications.Where(ia => ia.UserId == id).ToListAsync(ct);
+        foreach (var app in apps) app.UserId = null;
+        var posts = await _db.BlogPosts.Where(b => b.AuthorId == id).ToListAsync(ct);
+        foreach (var post in posts) post.AuthorId = null;
+        _db.Users.Remove(user);
+        await _db.SaveChangesAsync(ct);
+        TempData["Message"] = $"{user.FullName} kullanıcısı silindi.";
+        return RedirectToAction(nameof(Index));
     }
 }

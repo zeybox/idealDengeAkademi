@@ -26,7 +26,7 @@
         <div class="form-group">
           <label asp-for="Password">Şifre</label>
           <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-            <input type="password" asp-for="Password" id="Password" class="form-control" placeholder="Veritabanındaki şifre" maxlength="256" style="max-width: 240px;" />
+            <input type="password" name="Password" id="Password" value="@(Model.Password ?? "")" class="form-control" placeholder="Veritabanındaki şifre" maxlength="256" style="max-width: 240px;" />
             <button type="button" id="togglePassword" class="btn btn-ghost" aria-label="Şifreyi göster/gizle" title="Şifreyi göster">👁</button>
           </div>
         </div>
@@ -105,7 +105,7 @@
               if (preview) { preview.src = res.url; preview.style.display = 'block'; }
               if (placeholder) placeholder.style.display = 'none';
             })
-            .catch(function(err) { alert(err.message || 'Yükleme hatası'); })
+            .catch(function(err) { (window.showAlertModal || alert)(err.message || 'Yükleme hatası'); })
             .finally(function() { btn.disabled = false; input.value = ''; });
         });
       }

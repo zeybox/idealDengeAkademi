@@ -10,22 +10,32 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="@Url.Content(ViewData["FaviconUrl"] as string ?? "~/images/Logo.png")" />
   <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
+  <script src="https://unpkg.com/lucide@0.454.0/dist/umd/lucide.min.js" crossorigin="anonymous"></script>
 </head>
 <body>
   <div class="admin-layout">
     <aside class="admin-sidebar">
       <a asp-area="" asp-controller="Home" asp-action="Index" class="logo"><img src="@Url.Content(ViewData["AdminLogoUrl"] as string ?? ViewData["SiteLogoUrl"] as string ?? "~/images/Logo.png")" alt="@(ViewData["SiteName"] ?? "İdeal Denge Akademi")"></a>
       <nav class="admin-nav">
-        <a asp-area="Egitmen" asp-controller="Home" asp-action="Index">Panel</a>
-        <a asp-area="Egitmen" asp-controller="Courses" asp-action="Index">Eğitimlerim</a>
-        <a asp-area="Egitmen" asp-controller="Sales" asp-action="Index">Satışlarım</a>
-        <a asp-area="Egitmen" asp-controller="Profile" asp-action="Index">Profilim</a>
-        <a asp-area="" asp-controller="Home" asp-action="Index" style="margin-top: 24px; border-top: 1px solid #334155; padding-top: 24px;">Siteye Dön</a>
+        <a asp-area="Egitmen" asp-controller="Home" asp-action="Index"><i data-lucide="layout-dashboard" class="nav-icon" aria-hidden="true"></i><span>Panel</span></a>
+        <a asp-area="Egitmen" asp-controller="Courses" asp-action="Index"><i data-lucide="book-open" class="nav-icon" aria-hidden="true"></i><span>Eğitimlerim</span></a>
+        <a asp-area="Egitmen" asp-controller="Sales" asp-action="Index"><i data-lucide="trending-up" class="nav-icon" aria-hidden="true"></i><span>Satışlarım</span></a>
+        <a asp-area="Egitmen" asp-controller="Profile" asp-action="Index"><i data-lucide="user" class="nav-icon" aria-hidden="true"></i><span>Profilim</span></a>
+        <a asp-area="" asp-controller="Home" asp-action="Index" class="nav-back"><i data-lucide="arrow-left" class="nav-icon" aria-hidden="true"></i><span>Siteye Dön</span></a>
       </nav>
     </aside>
     <main class="admin-main">
+      @{
+        var controller = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+        var titleIcon = controller switch {
+          "Courses" => "book-open",
+          "Sales" => "trending-up",
+          "Profile" => "user",
+          _ => "layout-dashboard"
+        };
+      }
       <div class="admin-header">
-        <h1>@ViewData["Title"]</h1>
+        <h1 class="admin-page-title"><i data-lucide="@titleIcon" class="header-title-icon" aria-hidden="true"></i><span>@ViewData["Title"]</span></h1>
         <a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-ghost">Siteye Git</a>
       </div>
       @if (TempData["Toast"] != null)
@@ -36,7 +46,12 @@
     </main>
   </div>
   <script src="~/js/main.js" asp-append-version="true"></script>
-  @await RenderSectionAsync("Scripts", required: false)
   @await Html.PartialAsync("_ConfirmModal")
+  @await RenderSectionAsync("Scripts", required: false)
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.lucide) lucide.createIcons();
+    });
+  </script>
 </body>
 </html>
