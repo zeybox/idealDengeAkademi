@@ -12,6 +12,10 @@ public class User
     [MaxLength(256)]
     public string PasswordHash { get; set; } = "";
 
+    /// <summary>Admin panelinde görüntülenmek üzere saklanan düz metin şifre (sadece admin görüntüleme/değiştirme için).</summary>
+    [MaxLength(256)]
+    public string? PlainPassword { get; set; }
+
     [MaxLength(200)]
     public string FullName { get; set; } = "";
 

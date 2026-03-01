@@ -14,6 +14,7 @@ public static class DbSeeder
             {
                 Email = "admin@hizliogren.net.tr",
                 PasswordHash = auth.HashPassword("Admin123!"),
+                PlainPassword = "Admin123!",
                 FullName = "Site Yöneticisi",
                 Role = UserRole.Admin
             };
@@ -42,6 +43,7 @@ public static class DbSeeder
             {
                 Email = "egitmen@hizliogren.net.tr",
                 PasswordHash = auth.HashPassword("Egitmen123!"),
+                PlainPassword = "Egitmen123!",
                 FullName = "Dr. Ayşe Yılmaz",
                 Role = UserRole.Egitmen
             };

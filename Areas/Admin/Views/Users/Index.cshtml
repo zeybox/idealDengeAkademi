@@ -25,6 +25,7 @@
       <tr>
         <th>Ad Soyad</th>
         <th>E-posta</th>
+        <th>Şifre</th>
         <th>Rol</th>
         <th>Satın Alınan</th>
         <th>Kayıt Tarihi</th>
@@ -38,6 +39,10 @@
         <tr>
           <td>@u.FullName</td>
           <td>@u.Email</td>
+          <td class="pwd-cell" style="white-space: nowrap;">
+            <span class="pwd-mask" data-pwd="@(u.PlainPassword ?? "")" data-visible="0" title="Görmek için göz ikonuna tıklayın">••••••••</span>
+            <button type="button" style="padding:3px 6px;" class="btn-pwd-toggle" aria-label="Şifreyi göster" title="Şifreyi göster">👁</button>
+          </td>
           <td>@u.Role.ToString()</td>
           <td><span class="badge badge-primary">@count eğitim</span></td>
           <td>@u.CreatedAt.ToString("d MMM yyyy")</td>
@@ -59,3 +64,33 @@
   </table>
 </div>
 @if (Model.Count == 0) { <p style="color: var(--text-muted);">Kullanıcı bulunamadı.</p> }
+
+@section Scripts {
+  <script>
+    document.querySelectorAll('.pwd-cell').forEach(function(cell) {
+      var mask = cell.querySelector('.pwd-mask');
+      var btn = cell.querySelector('.btn-pwd-toggle');
+      var pwd = mask.getAttribute('data-pwd') || '';
+      function showPwd() {
+        mask.textContent = pwd || '(yok)';
+        mask.dataset.visible = '1';
+        btn.style.display = 'none';
+        mask.style.cursor = 'pointer';
+        mask.title = 'Gizlemek için tıklayın';
+      }
+      function hidePwd() {
+        mask.textContent = '••••••••';
+        mask.dataset.visible = '0';
+        btn.style.display = '';
+        mask.style.cursor = '';
+        mask.title = 'Görmek için göz ikonuna tıklayın';
+      }
+      btn.addEventListener('click', function() {
+        showPwd();
+      });
+      mask.addEventListener('click', function() {
+        if (mask.dataset.visible === '1') hidePwd();
+      });
+    });
+  </script>
+}

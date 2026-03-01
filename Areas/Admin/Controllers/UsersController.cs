@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using HizliOgren.Data;
 using HizliOgren.Helpers;
 using HizliOgren.Models;
+using HizliOgren.Services;
 
 namespace HizliOgren.Areas.Admin.Controllers;
 
@@ -13,8 +14,13 @@ namespace HizliOgren.Areas.Admin.Controllers;
 public class UsersController : Controller
 {
     private readonly ApplicationDbContext _db;
+    private readonly AuthService _authService;
 
-    public UsersController(ApplicationDbContext db) => _db = db;
+    public UsersController(ApplicationDbContext db, AuthService authService)
+    {
+        _db = db;
+        _authService = authService;
+    }
 
     public async Task<IActionResult> Index(string? q, string? role, CancellationToken ct = default)
     {
@@ -33,21 +39,56 @@ public class UsersController : Controller
     {
         var user = await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id, ct);
         if (user == null) return NotFound();
+        var model = new AdminUserEditModel
+        {
+            Id = user.Id,
+            FullName = user.FullName,
+            Email = user.Email,
+            Role = user.Role,
+            City = user.City,
+            Title = user.Title,
+            Bio = user.Bio,
+            AvatarUrl = user.AvatarUrl,
+            Phone = user.Phone,
+            Password = user.PlainPassword ?? ""
+        };
         ViewBag.Roles = new SelectList(new[] {
             new { Value = (int)UserRole.Uye, Text = "Üye" },
             new { Value = (int)UserRole.Egitmen, Text = "Eğitmen" },
             new { Value = (int)UserRole.Admin, Text = "Admin" }
         }, "Value", "Text", (int)user.Role);
         ViewBag.CityList = TurkishCities.GetCitySelectList(user.City);
-        return View(user);
+        return View(model);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(User model, CancellationToken ct = default)
+    public async Task<IActionResult> Edit(AdminUserEditModel model, CancellationToken ct = default)
     {
         var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == model.Id, ct);
         if (user == null) return NotFound();
+
+        void SetEditViewBag()
+        {
+            ViewBag.Roles = new SelectList(new[] {
+                new { Value = (int)UserRole.Uye, Text = "Üye" },
+                new { Value = (int)UserRole.Egitmen, Text = "Eğitmen" },
+                new { Value = (int)UserRole.Admin, Text = "Admin" }
+            }, "Value", "Text", (int)model.Role);
+            ViewBag.CityList = TurkishCities.GetCitySelectList(model.City);
+        }
+
+        if (!ModelState.IsValid)
+        {
+            SetEditViewBag();
+            return View(model);
+        }
+
+        if (!string.IsNullOrWhiteSpace(model.Password))
+        {
+            user.PasswordHash = _authService.HashPassword(model.Password.Trim());
+            user.PlainPassword = model.Password.Trim();
+        }
 
         user.FullName = model.FullName?.Trim() ?? "";
         user.Email = model.Email?.Trim() ?? "";

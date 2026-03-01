@@ -101,6 +101,7 @@ public class AuthController : Controller
             FullName = (model.FullName ?? "").Trim(),
             City = string.IsNullOrWhiteSpace(model.City) ? null : model.City.Trim(),
             PasswordHash = _authService.HashPassword(password),
+            PlainPassword = password,
             Role = UserRole.Uye,
             CreatedAt = DateTime.UtcNow
         };
