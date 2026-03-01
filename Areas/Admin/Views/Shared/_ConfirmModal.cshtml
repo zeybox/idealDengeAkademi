@@ -1,13 +1,13 @@
 @* Silme / onay modalı - js alert kullanılmaz *@
 <div class="modal-overlay" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
-  <div class="modal">
-    <h3 id="confirmModalTitle" style="font-size: 1.2rem; margin-bottom: 12px;">Emin misiniz?</h3>
-    <p class="confirm-message" style="color: var(--text-muted); margin-bottom: 24px;"></p>
-    <div style="display: flex; gap: 12px; justify-content: flex-end;">
+  <div class="modal" style="padding: 28px;">
+    <h3 id="confirmModalTitle" style="font-size: 1.25rem; font-weight: 600; margin: 0 0 12px 0;">Emin misiniz?</h3>
+    <p class="confirm-message" style="color: var(--text-muted); margin: 0 0 24px 0; line-height: 1.5;"></p>
+    <div style="display: flex; gap: 12px; justify-content: flex-end; flex-wrap: wrap;">
       <button type="button" class="btn btn-ghost modal-close">İptal</button>
       <form method="post" class="confirm-form" style="display: inline;">
         @Html.AntiForgeryToken()
-        <button type="submit" class="btn btn-primary">Evet, sil</button>
+        <button type="submit" class="btn btn-primary confirm-submit-btn">Evet, sil</button>
       </form>
     </div>
   </div>
@@ -19,8 +19,10 @@
     if (!overlay) return;
     var msg = overlay.querySelector('.confirm-message');
     var form = overlay.querySelector('.confirm-form');
+    var submitBtn = overlay.querySelector('.confirm-submit-btn');
     if (msg) msg.textContent = options.message || 'Bu öğeyi silmek istediğinize emin misiniz?';
     if (form) { form.action = options.action || '#'; form.method = options.method || 'post'; }
+    if (submitBtn && options.buttonText) submitBtn.textContent = options.buttonText;
     overlay.classList.add('active');
     document.body.style.overflow = 'hidden';
   }
@@ -30,7 +32,8 @@
       e.preventDefault();
       var action = this.getAttribute('data-delete-action') || (this.closest('form') && this.closest('form').action);
       var msg = this.getAttribute('data-delete-message') || 'Bu öğeyi silmek istediğinize emin misiniz?';
-      showConfirmModal({ action: action || '#', message: msg });
+      var btnText = this.getAttribute('data-delete-button-text');
+      showConfirmModal({ action: action || '#', message: msg, buttonText: btnText || 'Evet, sil' });
     });
   });
   var confirmOverlay = document.getElementById('confirmModal');

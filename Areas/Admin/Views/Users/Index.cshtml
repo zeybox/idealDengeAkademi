@@ -44,19 +44,13 @@
             <button type="button" style="padding:3px 6px;" class="btn-pwd-toggle" aria-label="Şifreyi göster" title="Şifreyi göster">👁</button>
           </td>
           <td>@u.Role.ToString()</td>
-          <td><span class="badge badge-primary">@count eğitim</span></td>
+          <td>
+          <span class="badge badge-primary">@count eğitim</span>
+          <a asp-action="EditCourses" asp-route-id="@u.Id" class="btn btn-ghost btn-sm">Eğitimleri düzenle</a>
+          </td>
           <td>@u.CreatedAt.ToString("d MMM yyyy")</td>
           <td>
             <a asp-action="Edit" asp-route-id="@u.Id" class="btn btn-ghost btn-sm">Düzenle</a>
-            <form method="post" asp-action="ChangeRole" asp-route-id="@u.Id" style="display: inline-flex; gap: 6px; align-items: center;">
-              @Html.AntiForgeryToken()
-              <select name="role" class="form-control" style="width: auto; min-width: 100px;">
-                <option value="0" selected="@(u.Role == HizliOgren.Models.UserRole.Uye)">Üye</option>
-                <option value="1" selected="@(u.Role == HizliOgren.Models.UserRole.Egitmen)">Eğitmen</option>
-                <option value="2" selected="@(u.Role == HizliOgren.Models.UserRole.Admin)">Admin</option>
-              </select>
-              <button type="submit" class="btn btn-ghost btn-sm">Rol Güncelle</button>
-            </form>
           </td>
         </tr>
       }

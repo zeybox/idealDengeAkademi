@@ -1,0 +1,65 @@
+@model HizliOgren.Models.AdminUserCoursesModel
+@{
+  ViewData["Title"] = "Eğitim paketleri: " + Model.UserFullName;
+}
+<div class="card" style="padding: 24px; max-width: 720px;">
+  <h2>@Model.UserFullName — Eğitim paketlerini düzenle</h2>
+  <p><a asp-action="Index" class="btn btn-ghost btn-sm">← Kullanıcı listesi</a></p>
+
+  <h3 style="margin-top: 24px;">Satın alınan eğitimler</h3>
+  @if (Model.Purchased.Count == 0)
+  {
+    <p style="color: var(--text-muted);">Bu üyenin henüz satın aldığı eğitim yok.</p>
+  }
+  else
+  {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Eğitim</th>
+            <th style="width: 100px;">İşlem</th>
+          </tr>
+        </thead>
+        <tbody>
+          @foreach (var item in Model.Purchased)
+          {
+            <tr>
+              <td>@item.Title</td>
+              <td>
+                <button type="button" class="btn btn-ghost btn-sm" data-confirm-delete
+                  data-delete-action="@Url.Action("RemoveCourse", "Users", new { area = "Admin", id = Model.UserId, userCourseId = item.UserCourseId })"
+                  data-delete-message="«@item.Title» eğitimini bu üyeden kaldırmak istediğinize emin misiniz?"
+                  data-delete-button-text="Evet, kaldır">Kaldır</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <h3 style="margin-top: 24px;">Eğitim ekle</h3>
+  @if (Model.AvailableToAdd.Count == 0)
+  {
+    <p style="color: var(--text-muted);">Eklenebilecek başka eğitim yok; üye tüm eğitimlere sahip.</p>
+  }
+  else
+  {
+    <form method="post" asp-action="AddCourse" asp-route-id="@Model.UserId" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+      @Html.AntiForgeryToken()
+      <select name="courseId" class="form-control" required style="max-width: 320px;">
+        <option value="">— Eğitim seçin —</option>
+        @foreach (var c in Model.AvailableToAdd)
+        {
+          <option value="@c.Id">@c.Title</option>
+        }
+      </select>
+      <button type="submit" class="btn btn-primary">Ekle</button>
+    </form>
+  }
+</div>
+@if (TempData["Toast"] != null)
+{
+  <p class="alert alert-success" style="margin-top: 16px;">@TempData["Toast"]</p>
+}

@@ -104,15 +104,70 @@ public class UsersController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    /// <summary>Üyenin satın aldığı eğitimleri yönet: ekle veya kaldır.</summary>
+    public async Task<IActionResult> EditCourses(int id, CancellationToken ct = default)
+    {
+        var user = await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id, ct);
+        if (user == null) return NotFound();
+
+        var purchased = await _db.UserCourses
+            .AsNoTracking()
+            .Where(uc => uc.UserId == id)
+            .Include(uc => uc.Course)
+            .OrderBy(uc => uc.Course.Title)
+            .Select(uc => new UserCourseItem
+            {
+                UserCourseId = uc.Id,
+                CourseId = uc.CourseId,
+                Title = uc.Course.Title
+            })
+            .ToListAsync(ct);
+
+        var purchasedIds = purchased.Select(p => p.CourseId).ToHashSet();
+        var availableToAdd = await _db.Courses
+            .AsNoTracking()
+            .Where(c => !purchasedIds.Contains(c.Id))
+            .OrderBy(c => c.Title)
+            .Select(c => new CourseItem { Id = c.Id, Title = c.Title })
+            .ToListAsync(ct);
+
+        var model = new AdminUserCoursesModel
+        {
+            UserId = user.Id,
+            UserFullName = user.FullName,
+            Purchased = purchased,
+            AvailableToAdd = availableToAdd
+        };
+        return View(model);
+    }
+
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> ChangeRole(int id, UserRole role, CancellationToken ct = default)
+    public async Task<IActionResult> AddCourse(int id, int courseId, CancellationToken ct = default)
     {
         var user = await _db.Users.FindAsync(new object[] { id }, ct);
         if (user == null) return NotFound();
-        user.Role = role;
-        await _db.SaveChangesAsync(ct);
-        TempData["Message"] = $"{user.FullName} rolü \"{role}\" olarak güncellendi.";
-        return RedirectToAction(nameof(Index), new { q = Request.Query["q"], role = Request.Query["role"] });
+        var exists = await _db.UserCourses.AnyAsync(uc => uc.UserId == id && uc.CourseId == courseId, ct);
+        if (!exists)
+        {
+            _db.UserCourses.Add(new UserCourse { UserId = id, CourseId = courseId });
+            await _db.SaveChangesAsync(ct);
+        }
+        TempData["Toast"] = "Eğitim eklendi.";
+        return RedirectToAction(nameof(EditCourses), new { id });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RemoveCourse(int id, int userCourseId, CancellationToken ct = default)
+    {
+        var uc = await _db.UserCourses.FirstOrDefaultAsync(x => x.Id == userCourseId && x.UserId == id, ct);
+        if (uc != null)
+        {
+            _db.UserCourses.Remove(uc);
+            await _db.SaveChangesAsync(ct);
+            TempData["Toast"] = "Eğitim kaldırıldı.";
+        }
+        return RedirectToAction(nameof(EditCourses), new { id });
     }
 }
