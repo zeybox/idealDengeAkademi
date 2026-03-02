@@ -1184,6 +1184,25 @@ th {
   color: var(--text);
 }
 
+th.sortable {
+  user-select: none;
+  white-space: nowrap;
+}
+th.sortable:hover {
+  color: var(--primary);
+}
+th.sortable .th-label {
+  margin-right: 4px;
+}
+th.sortable .sort-indicator {
+  font-size: 0.7em;
+  opacity: 0.8;
+  color: var(--primary);
+}
+th.sortable .sort-indicator:empty {
+  display: none;
+}
+
 tr:last-child td {
   border-bottom: none;
 }
